@@ -199,6 +199,7 @@ dependencies {
   implementation("com.meta.spatial:meta-spatial-sdk-vr:$metaSpatialSdkVersion")
   implementation("com.meta.spatial:meta-spatial-sdk-mruk:$metaSpatialSdkVersion")
   implementation("com.meta.spatial:meta-spatial-sdk-castinputforward:$metaSpatialSdkVersion")
+  implementation(files("libs/meta-spatial-uiset-1.0.1.aar"))
 
   // Meta Spatial SDK dependencies
   implementation("com.squareup.okhttp3:okhttp:4.12.0")
