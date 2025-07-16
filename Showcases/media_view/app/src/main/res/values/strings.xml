@@ -22,7 +22,11 @@
     name="storage_saving_samples_loading"
   >Loading sample media. This may take a minute, please wait…</string>
     <!-- Gallery -->
-    <string name="viewing_n_files">Viewing %1$d files</string>
+    <string name="no_files">No files</string>
+    <plurals name="viewing_n_files">
+        <item quantity="one">Viewing %1$d file</item>
+        <item quantity="other">Viewing %1$d files</item>
+    </plurals>
     <string name="sort_by">Sort By</string>
     <string name="sort_by_date_desc">Date Added: Earliest</string>
     <string name="sort_by_date_asc">Date Added: Oldest</string>

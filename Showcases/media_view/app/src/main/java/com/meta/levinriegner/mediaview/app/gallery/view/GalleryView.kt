@@ -45,6 +45,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -143,8 +144,14 @@ private fun Header(
               style = MaterialTheme.typography.titleMedium,
           )
           Spacer(Modifier.size(Dimens.xSmall))
+          val resources = LocalContext.current.resources
           Text(
-              text = stringResource(R.string.viewing_n_files, fileCount),
+              text =
+                  if (fileCount == 0) {
+                    stringResource(R.string.no_files)
+                  } else {
+                    resources.getQuantityString(R.plurals.viewing_n_files, fileCount, fileCount)
+                  },
               style = MaterialTheme.typography.bodySmall.copy(color = AppColor.White60),
           )
         }
