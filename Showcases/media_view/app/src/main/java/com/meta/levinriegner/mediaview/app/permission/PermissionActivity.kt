@@ -52,6 +52,7 @@ import com.meta.levinriegner.mediaview.app.shared.theme.AppColor
 import com.meta.levinriegner.mediaview.app.shared.theme.Dimens
 import com.meta.levinriegner.mediaview.app.shared.theme.MediaViewTheme
 import com.meta.levinriegner.mediaview.app.shared.view.LoadingView
+import com.meta.levinriegner.mediaview.app.shared.view.component.MVSecondaryButton
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -235,16 +236,10 @@ private fun RequestPermissionRationale(
           textAlign = TextAlign.Center,
           style = MaterialTheme.typography.bodyMedium)
       Spacer(modifier = Modifier.height(Dimens.large))
-      OutlinedButton(
+      MVSecondaryButton(
+          title = stringResource(id = R.string.storage_permission_rationale_button),
           onClick = onRequest,
-          colors =
-              ButtonDefaults.buttonColors(
-                  contentColor = AppColor.White,
-                  containerColor = Color.Transparent,
-              ),
-      ) {
-        Text(text = stringResource(id = R.string.storage_permission_rationale_button))
-      }
+      )
     }
   }
 }

@@ -5,6 +5,7 @@ package com.meta.levinriegner.mediaview.app.privacy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.ClickableText
@@ -28,6 +29,7 @@ import com.meta.levinriegner.mediaview.R
 import com.meta.levinriegner.mediaview.app.shared.Constants
 import com.meta.levinriegner.mediaview.app.shared.theme.AppColor
 import com.meta.levinriegner.mediaview.app.shared.theme.Dimens
+import com.meta.levinriegner.mediaview.app.shared.view.component.MVSecondaryButton
 
 @OptIn(ExperimentalTextApi::class)
 @Composable
@@ -107,17 +109,9 @@ fun PrivacyPolicyView(
           }
         })
     Spacer(modifier = Modifier.height(Dimens.large))
-    OutlinedButton(
+    MVSecondaryButton(
+        title = stringResource(id = R.string.privacy_policy_accept_button),
         onClick = onAccepted,
-        colors =
-            ButtonDefaults.buttonColors(
-                contentColor = AppColor.White,
-                containerColor = Color.Transparent,
-            ),
-    ) {
-      Text(
-          text = stringResource(id = R.string.privacy_policy_accept_button),
-          style = MaterialTheme.typography.titleMedium)
-    }
+    )
   }
 }
