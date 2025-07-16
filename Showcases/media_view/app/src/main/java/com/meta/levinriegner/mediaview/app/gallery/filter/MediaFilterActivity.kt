@@ -124,7 +124,7 @@ private fun FilterList(
                   containerColor = Color.Transparent,
               ),
           onClick = { onUpload() }) {
-            IconTextLayoutForButton("Download Media", R.drawable.icon_upload)
+            IconTextLayoutForButton("Add Media", R.drawable.icon_upload)
           }
     }
   }
