@@ -130,10 +130,9 @@ private fun FilterList(
                   contentColor = AppColor.White,
                   containerColor = Color.Transparent,
               ),
-          onClick = { onUpload() },
-      ) {
-        IconTextLayoutForButton("Download Media", R.drawable.icon_upload)
-      }
+          onClick = { onUpload() }) {
+            IconTextLayoutForButton("Add Media", R.drawable.icon_upload)
+          }
     }
   }
 }
