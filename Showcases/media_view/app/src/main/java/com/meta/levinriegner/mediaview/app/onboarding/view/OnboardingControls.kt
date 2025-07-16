@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.meta.levinriegner.mediaview.app.shared.theme.AppColor
 import com.meta.levinriegner.mediaview.app.shared.theme.Dimens
+import com.meta.levinriegner.mediaview.app.shared.view.component.MVBorderlessCircleButton
 
 @Composable
 fun OnboardingControls(
@@ -37,21 +38,18 @@ fun OnboardingControls(
       modifier = Modifier.fillMaxSize(),
       horizontalArrangement = Arrangement.SpaceBetween,
       verticalAlignment = Alignment.CenterVertically) {
-        IconButton(
-            modifier =
-                Modifier.border(width = 1.dp, color = AppColor.White30, shape = CircleShape)
-                    .size(Dimens.large),
-            colors =
-                IconButtonDefaults.iconButtonColors(
-                    contentColor = AppColor.White,
-                ),
-            onClick = onPreviousButtonPressed) {
-              Icon(
-                  Icons.AutoMirrored.Filled.ArrowBack,
-                  contentDescription = "Go to previous step",
-                  modifier = Modifier.padding(Dimens.xSmall))
-            }
-
+          MVBorderlessCircleButton(
+              modifier = Modifier
+                  .size(width = Dimens.large, height = Dimens.large),
+              onClick = onPreviousButtonPressed,
+              borderColor = AppColor.White60,
+              icon = {
+                Icon(
+                    Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Go to previous step",
+                )
+              }
+          )
         Text(
             "$currentStep of $totalSteps",
             style = MaterialTheme.typography.bodySmall,
@@ -76,20 +74,18 @@ fun OnboardingControls(
                     modifier = Modifier.padding(Dimens.xSmall))
               }
         } else {
-          IconButton(
-              modifier =
-                  Modifier.border(width = 1.dp, color = AppColor.MetaBlu, shape = CircleShape)
-                      .size(Dimens.large),
-              colors =
-                  IconButtonDefaults.iconButtonColors(
-                      contentColor = AppColor.White,
-                  ),
-              onClick = onNextButtonPressed) {
+          MVBorderlessCircleButton(
+              modifier = Modifier
+                  .size(width = Dimens.large, height = Dimens.large),
+              onClick = onNextButtonPressed,
+              borderColor = AppColor.MetaBlu,
+              icon = {
                 Icon(
                     Icons.AutoMirrored.Filled.ArrowForward,
                     contentDescription = "Go to next step",
-                    modifier = Modifier.padding(Dimens.xSmall))
+                )
               }
+          )
         }
       }
 }

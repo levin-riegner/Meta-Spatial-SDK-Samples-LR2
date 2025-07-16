@@ -21,10 +21,15 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -51,6 +56,8 @@ import com.meta.levinriegner.mediaview.app.shared.theme.Dimens
 import com.meta.levinriegner.mediaview.app.shared.theme.MediaViewTheme
 import com.meta.levinriegner.mediaview.app.shared.view.ErrorView
 import com.meta.levinriegner.mediaview.app.shared.view.component.CloseButton
+import com.meta.levinriegner.mediaview.app.shared.view.component.MVBorderlessCircleButton
+import com.meta.levinriegner.mediaview.app.shared.view.component.MVCircleButton
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -146,14 +153,21 @@ class OnboardingActivity : ComponentActivity() {
                                   .padding(Dimens.small)) {
 
                             // Top bar with close button
-                            Box(modifier = Modifier.align(Alignment.End)) {
-                              CloseButton(
-                                  onPressed = {
-                                    pagerCoroutineScope.launch { pagerState.scrollToPage(0) }
-                                    viewModel.close()
-                                  })
-                            }
-
+                            MVBorderlessCircleButton(
+                                modifier =
+                                  Modifier.align(Alignment.End)
+                                          .size(width = Dimens.large, height = Dimens.large),
+                                onClick = {
+                                  pagerCoroutineScope.launch { pagerState.scrollToPage(0) }
+                                  viewModel.close()
+                                },
+                                icon = {
+                                  Icon(
+                                      Icons.Rounded.Close,
+                                      contentDescription = "Go to previous step"
+                                  )
+                                }
+                            )
                             val onFinishButtonPressed =
                                 if (!pagerState.canScrollForward) {
                                   {
