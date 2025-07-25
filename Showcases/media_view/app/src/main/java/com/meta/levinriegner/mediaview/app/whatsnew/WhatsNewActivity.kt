@@ -34,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -95,7 +96,7 @@ class WhatsNewActivity : ComponentActivity() {
                             Box(modifier = Modifier.height(Dimens.small))
                             RoundedButton(
                                 onClick = { uriHandler.openUri(Constants.WEBSITE_URL) },
-                                title = "Visit Our Website")
+                                title = stringResource(R.string.visit_our_website))
                           }
                     }
 
@@ -111,7 +112,7 @@ class WhatsNewActivity : ComponentActivity() {
                           horizontalArrangement = Arrangement.SpaceBetween,
                           verticalAlignment = Alignment.Top) {
                             Text(
-                                "V ${BuildConfig.VERSION_NAME} Updates",
+                                stringResource(R.string.whats_new_title, BuildConfig.VERSION_NAME),
                                 color = AppColor.White,
                                 textAlign = TextAlign.Start,
                                 style = MaterialTheme.typography.titleMedium)
@@ -172,7 +173,7 @@ class WhatsNewActivity : ComponentActivity() {
 
                         RoundedButton(
                             onClick = { viewModel.close() },
-                            title = "Continue",
+                            title = stringResource(R.string.continue_button),
                         )
                       }
                     }

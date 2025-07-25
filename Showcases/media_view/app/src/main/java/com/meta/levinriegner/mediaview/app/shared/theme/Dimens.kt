@@ -6,6 +6,7 @@ import androidx.compose.ui.unit.dp
 
 class Dimens {
   companion object {
+    val xxSmall = 4.dp
     val xSmall = 8.dp
     val small = 12.dp
     val medium = 16.dp
@@ -17,6 +18,7 @@ class Dimens {
     val radiusSmall = 5.dp
     val radiusMedium = 8.dp
     val radiusLarge = 16.dp
+    val radiusXLarge = 24.dp
 
     // View-specific dimensions
     const val playerMenuButtonSize = 54

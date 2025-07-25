@@ -8,14 +8,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.ClickableText
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.ExperimentalTextApi
@@ -28,6 +25,7 @@ import com.meta.levinriegner.mediaview.R
 import com.meta.levinriegner.mediaview.app.shared.Constants
 import com.meta.levinriegner.mediaview.app.shared.theme.AppColor
 import com.meta.levinriegner.mediaview.app.shared.theme.Dimens
+import com.meta.spatial.uiset.button.BorderedButton
 
 @OptIn(ExperimentalTextApi::class)
 @Composable
@@ -107,17 +105,10 @@ fun PrivacyPolicyView(
           }
         })
     Spacer(modifier = Modifier.height(Dimens.large))
-    OutlinedButton(
+    BorderedButton(
         onClick = onAccepted,
-        colors =
-            ButtonDefaults.buttonColors(
-                contentColor = AppColor.White,
-                containerColor = Color.Transparent,
-            ),
-    ) {
-      Text(
-          text = stringResource(id = R.string.privacy_policy_accept_button),
-          style = MaterialTheme.typography.titleMedium)
-    }
+        label = stringResource(id = R.string.privacy_policy_accept_button),
+        borderColor = AppColor.White60,
+    )
   }
 }

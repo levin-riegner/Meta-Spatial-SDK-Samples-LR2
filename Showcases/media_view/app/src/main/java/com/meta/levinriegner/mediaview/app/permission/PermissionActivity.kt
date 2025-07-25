@@ -26,9 +26,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,7 +35,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -52,6 +49,7 @@ import com.meta.levinriegner.mediaview.app.shared.theme.AppColor
 import com.meta.levinriegner.mediaview.app.shared.theme.Dimens
 import com.meta.levinriegner.mediaview.app.shared.theme.MediaViewTheme
 import com.meta.levinriegner.mediaview.app.shared.view.LoadingView
+import com.meta.spatial.uiset.button.BorderedButton
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -235,16 +233,11 @@ private fun RequestPermissionRationale(
           textAlign = TextAlign.Center,
           style = MaterialTheme.typography.bodyMedium)
       Spacer(modifier = Modifier.height(Dimens.large))
-      OutlinedButton(
-          onClick = onRequest,
-          colors =
-              ButtonDefaults.buttonColors(
-                  contentColor = AppColor.White,
-                  containerColor = Color.Transparent,
-              ),
-      ) {
-        Text(text = stringResource(id = R.string.storage_permission_rationale_button))
-      }
+      BorderedButton(
+        onClick = onRequest,
+        label = stringResource(id = R.string.storage_permission_rationale_button),
+        borderColor = AppColor.White60,
+      )
     }
   }
 }
