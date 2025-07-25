@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -21,37 +20,27 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.sharp.Info
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
+import com.meta.spatial.uiset.control.SpatialSwitch
+import com.meta.spatial.uiset.control.SwitchDefaults
+import com.meta.spatial.uiset.dropdown.SpatialDropdown
+import com.meta.spatial.uiset.dropdown.foundation.SpatialDropdownItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.foundation.background
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.meta.levinriegner.mediaview.R
 import com.meta.levinriegner.mediaview.app.gallery.filter.titleResId
 import com.meta.levinriegner.mediaview.app.onboarding.view.OnboardingButton
@@ -133,7 +122,6 @@ private fun Header(
     onToggleMetadata: (Boolean) -> Unit,
     onOnboardingButtonPressed: () -> Unit,
 ) {
-  var sortExpanded by remember { mutableStateOf(false) }
   Column {
     Box(modifier = Modifier.padding(Dimens.medium)) {
       Row(
@@ -163,118 +151,64 @@ private fun Header(
           OnboardingButton(onPressed = onOnboardingButtonPressed)
           Box(modifier = Modifier.size(Dimens.medium))
 
-          Column(horizontalAlignment = Alignment.End, modifier = Modifier) {
-            OutlinedButton(
-                onClick = { sortExpanded = true },
-                modifier = Modifier.height(40.dp).width(90.dp),
-                contentPadding = PaddingValues(start = 30.dp, end = 0.dp),
-                shape = RoundedCornerShape(20.dp),
-                colors =
-                    ButtonDefaults.buttonColors(
-                        contentColor = AppColor.White,
-                        containerColor = Color.Transparent,
-                    ),
-            ) {
-              Row(
-                  verticalAlignment = Alignment.CenterVertically,
-                  horizontalArrangement = Arrangement.Absolute.Left,
-              ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.icon_sortby),
-                    contentDescription = "Button Icon",
-                    modifier = Modifier.size(20.dp).offset(x = (-20).dp, y = 0.dp),
-                )
-                Text(
-                    modifier = Modifier.fillMaxWidth().offset(x = (-17).dp, y = 0.dp),
-                    text = stringResource(id = R.string.sort_by),
-                    // style = MaterialTheme.typography.bodyMedium.copy(fontWeight =
-                    // FontWeight.Bold),
-                    color = Color.White,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Left,
-                )
-              }
-            }
-
-            MaterialTheme(
-                shapes = MaterialTheme.shapes.copy(extraSmall = RoundedCornerShape(16.dp))
-            ) {
-              DropdownMenu(
-                  expanded = sortExpanded,
-                  onDismissRequest = { sortExpanded = false },
-                  modifier =
-                      Modifier.shadow(2.dp)
-                          .border(1.dp, AppColor.MetaBlu, RoundedCornerShape(16.dp))
-                          .background(
-                              Brush.verticalGradient(
-                                  listOf(AppColor.GradientStart, AppColor.GradientEnd)
-                              )
-                          ),
-              ) {
-                for (option in MediaSortBy.entries) {
-                  DropdownMenuItem(
-                      contentPadding = PaddingValues(10.dp),
-                      trailingIcon =
-                          if (option == sortBy)
-                              ({
-                                Icon(
-                                    imageVector = Icons.Default.Check,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(15.dp),
-                                )
-                              })
-                          else null,
-                      text = {
-                        Text(
-                            fontSize = 10.sp,
-                            color = AppColor.White,
-                            text =
-                                stringResource(
-                                    when (option) {
-                                      MediaSortBy.DateDesc -> R.string.sort_by_date_desc
-                                      MediaSortBy.DateAsc -> R.string.sort_by_date_asc
-                                      MediaSortBy.SizeAsc -> R.string.sort_by_size_asc
-                                      MediaSortBy.SizeDesc -> R.string.sort_by_size_desc
-                                      MediaSortBy.NameAsc -> R.string.sort_by_name_asc
-                                      MediaSortBy.NameDesc -> R.string.sort_by_name_desc
-                                    }
-                                ),
-                        )
-                      },
-                      onClick = {
-                        sortExpanded = false
-                        onSortBy(option)
-                      },
-                  )
-                  if (option != MediaSortBy.NameDesc)
-                      HorizontalDivider(color = AppColor.White15, thickness = 1.dp)
+          val sortByItems = remember {
+            MediaSortBy.entries.map { option ->
+              SpatialDropdownItem(
+                title = when (option) {
+                  MediaSortBy.DateDesc -> "Date Added: Earliest"
+                  MediaSortBy.DateAsc -> "Date Added: Oldest"
+                  MediaSortBy.SizeAsc -> "File Size: Smallest"
+                  MediaSortBy.SizeDesc -> "File Size: Largest"
+                  MediaSortBy.NameAsc -> "Name: A to Z"
+                  MediaSortBy.NameDesc -> "Name: Z to A"
                 }
-              }
+              )
             }
           }
 
+          SpatialDropdown(
+              modifier = Modifier.height(40.dp).width(120.dp).border(1.dp, AppColor.White15, RoundedCornerShape(Dimens.radiusXLarge)),
+              filled = false,
+              leading = {
+                Icon(
+                    painter = painterResource(id = R.drawable.icon_sortby),
+                    contentDescription = "Sort by icon",
+                    tint = AppColor.White
+                )
+              },
+              title = stringResource(id = R.string.sort_by),
+              items = sortByItems,
+              selectedItem = null,
+              showChevron = false,
+              menuModifier = Modifier
+                  .background(AppColor.BackgroundSweep)
+                  .border(1.dp, AppColor.MetaBlu, RoundedCornerShape(12.dp)),
+              showDividers = true,
+              onItemSelected = { item ->
+                val selectedSortBy = MediaSortBy.entries[sortByItems.indexOf(item)]
+                onSortBy(selectedSortBy)
+              }
+          )
+
           Box(modifier = Modifier.size(Dimens.medium))
-          Switch(
+          SpatialSwitch(
               thumbContent = {
                 Icon(
                     Icons.Sharp.Info,
                     "Toggle media info",
                 )
               },
-              colors =
-                  SwitchDefaults.colors()
-                      .copy(
-                          uncheckedThumbColor = AppColor.White60,
-                          uncheckedBorderColor = Color.Transparent,
-                          uncheckedTrackColor = AppColor.White15,
-                          checkedThumbColor = Color.White,
-                          checkedBorderColor = Color.Transparent,
-                          checkedTrackColor = AppColor.White15,
-                          checkedIconColor = AppColor.MetaBlu,
-                      ),
               checked = showMetadata,
               onCheckedChange = { onToggleMetadata(it) },
+              colors = SwitchDefaults.colors().copy(
+                  uncheckedThumbColor = AppColor.White60,
+                  uncheckedBorderColor = Color.Transparent,
+                  uncheckedTrackColor = AppColor.White15,
+                  checkedThumbColor = Color.White,
+                  checkedBorderColor = Color.Transparent,
+                  checkedTrackColor = AppColor.White15,
+                  checkedIconColor = AppColor.MetaBlu,
+              ),
           )
         }
       }

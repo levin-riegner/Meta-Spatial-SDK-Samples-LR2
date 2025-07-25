@@ -19,15 +19,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
@@ -36,14 +31,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.meta.levinriegner.mediaview.R
 import com.meta.levinriegner.mediaview.app.shared.theme.AppColor
+import com.meta.levinriegner.mediaview.app.shared.theme.Dimens
 import com.meta.levinriegner.mediaview.app.shared.theme.MediaViewTheme
 import dagger.hilt.android.AndroidEntryPoint
+import com.meta.spatial.uiset.navigation.SpatialSideNavItem
+import com.meta.spatial.uiset.button.BorderedButton
 
 @AndroidEntryPoint
 class MediaFilterActivity : ComponentActivity() {
@@ -62,23 +60,18 @@ class MediaFilterActivity : ComponentActivity() {
       val filters = viewModel.filters.collectAsState()
       // UI
       MediaViewTheme {
-        Scaffold(
-            modifier =
-                Modifier.fillMaxSize()
-                    .border(
-                        width = 4.dp,
-                        color = AppColor.MetaBlu,
-                        shape = RoundedCornerShape(24.dp),
-                    )
-                    .clip(RoundedCornerShape(24.dp))
-        ) { innerPadding ->
-          Column(modifier = Modifier.padding(innerPadding).background(AppColor.BackgroundSweep)) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .border(width = 4.dp, color = AppColor.MetaBlu, shape = RoundedCornerShape(24.dp))
+                .clip(RoundedCornerShape(24.dp))
+                .background(AppColor.BackgroundSweep)
+        ) {
             FilterList(
                 pickerFilter = filters.value,
                 onFilterSelected = { viewModel.onFilterSelected(it) },
-                onUpload = { viewModel.onUpload() },
+                onUpload = { viewModel.onUpload() }
             )
-          }
         }
       }
     }
@@ -91,77 +84,73 @@ private fun FilterList(
     onFilterSelected: (UiMediaFilter) -> Unit,
     onUpload: () -> Unit,
 ) {
-  Column(modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp, vertical = 40.dp)) {
-    LazyVerticalGrid(columns = GridCells.Fixed(1), modifier = Modifier) {
-      items(pickerFilter.size) { index ->
-        Button(
-            modifier =
-                Modifier.padding(horizontal = 10.dp, vertical = 20.dp).height(96.dp).fillMaxWidth(),
-            shape = RoundedCornerShape(30.dp),
-            colors =
-                ButtonDefaults.buttonColors(
-                    containerColor =
-                        if (pickerFilter[index].isSelected) AppColor.ButtonSelect
-                        else Color.Transparent,
-                    contentColor = AppColor.White,
-                ),
-            onClick = { onFilterSelected(pickerFilter[index]) },
-        ) {
-          IconTextLayoutForButton(
-              stringResource(pickerFilter[index].type.titleResId()),
-              pickerFilter[index].type.iconResId(),
-          )
+  Column(modifier = Modifier
+      .fillMaxSize()
+      .padding(horizontal = 20.dp, vertical = 40.dp)) {
+    LazyColumn(
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        items(pickerFilter) { filter ->
+            SpatialSideNavItem(
+                modifier = Modifier
+                    .padding(horizontal = 10.dp, vertical = 20.dp)
+                    .fillMaxWidth()
+                    .height(96.dp)
+                    .clip(RoundedCornerShape(Dimens.xLarge)),
+                icon = {
+                    Icon(
+                        painter = painterResource(id = filter.type.iconResId()),
+                        contentDescription = "Button Icon",
+                        modifier = Modifier
+                            .size(128.dp)
+                            .padding(end = Dimens.xLarge)
+                    )
+                },
+                onClick = { onFilterSelected(filter) },
+                primaryLabel = stringResource(filter.type.titleResId()),
+                selected = filter.isSelected,
+                showExpandedIcon = true,
+                dense = false,
+                primaryTextStyle = TextStyle(fontSize = 35.sp, fontWeight = FontWeight.Bold),
+                selectedBackgroundColor = AppColor.ButtonSelect,
+            )
         }
-      }
     }
 
-    Row(
-        modifier = Modifier.fillMaxWidth().weight(0.5F).background(Color.Transparent),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {}
+     Row(
+         modifier = Modifier
+             .fillMaxWidth()
+             .weight(0.5F)
+             .background(Color.Transparent),
+         horizontalArrangement = Arrangement.Center,
+         verticalAlignment = Alignment.CenterVertically) {}
 
-    Row(verticalAlignment = Alignment.Bottom) {
-      OutlinedButton(
+
+      BorderedButton(
           modifier =
-              Modifier.padding(horizontal = 10.dp, vertical = 20.dp).height(96.dp).fillMaxWidth(),
-          colors =
-              ButtonDefaults.buttonColors(
-                  contentColor = AppColor.White,
-                  containerColor = Color.Transparent,
-              ),
-          onClick = { onUpload() }) {
-            IconTextLayoutForButton("Add Media", R.drawable.icon_upload)
-          }
-    }
-  }
-}
+              Modifier
+                  .padding(horizontal = 10.dp, vertical = 20.dp)
+                  .height(96.dp)
+                  .fillMaxWidth(),
+          label = stringResource(R.string.add_media),
+          onClick = { onUpload() },
+          borderColor = AppColor.White60,
+          labelTextStyle = TextStyle(fontSize = 35.sp, fontWeight = FontWeight.Bold),
+          expanded = true,
+          leading = {
+            Row {
+              Icon(
+                  painter = painterResource(id = R.drawable.icon_upload),
+                  contentDescription = stringResource(R.string.add_media),
+                  modifier = Modifier
+                      .size(84.dp)
+                      .padding(start = 0.dp, end = 0.dp),
+              )
+              Spacer(modifier = Modifier.width(40.dp))
 
-// TODO: Make this more generic by accepting more parameters like font size/weight/alignment etc
-@Composable
-private fun IconTextLayoutForButton(
-    textToDisplay: String,
-    iconAsset: Int,
-) {
-  Row(
-      verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.Absolute.Left,
-      modifier = Modifier.fillMaxWidth(),
-      // .fillMaxSize()
-  ) {
-    Icon(
-        painter = painterResource(id = iconAsset),
-        contentDescription = "Button Icon",
-        modifier = Modifier.size(128.dp),
-    )
-
-    Spacer(modifier = Modifier.width(40.dp))
-    Text(
-        text = textToDisplay,
-        color = Color.White,
-        fontSize = 35.sp,
-        fontWeight = FontWeight.Bold,
-        textAlign = TextAlign.Left,
-    )
+            }
+          },
+          contentAlignment = Alignment.Start,
+      )
   }
 }

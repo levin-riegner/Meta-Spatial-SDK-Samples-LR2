@@ -13,10 +13,8 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -27,8 +25,6 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Slider
-import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -58,6 +54,7 @@ import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import timber.log.Timber
+import com.meta.spatial.uiset.slider.SpatialSliderSmall
 
 @Composable
 fun VideoView(
@@ -139,8 +136,6 @@ fun VideoView(
         isPlaying = { isPlaying },
         title = { exoPlayer.mediaMetadata.displayTitle?.toString() },
         playbackState = { playbackState },
-        onReplayClick = { exoPlayer.seekBack() },
-        onForwardClick = { exoPlayer.seekForward() },
         onPauseToggle = {
           when {
             exoPlayer.isPlaying -> {
@@ -168,7 +163,6 @@ fun VideoView(
         },
         totalDuration = { totalDuration },
         currentTime = { currentTime },
-        bufferedPercentage = { bufferedPercentage },
         onSeekChanged = { timeMs: Float ->
           exoPlayer.seekTo(timeMs.toLong())
           exoPlayer.playWhenReady = true
@@ -185,12 +179,9 @@ private fun PlayerControls(
     isVisible: () -> Boolean,
     isPlaying: () -> Boolean,
     title: () -> String?,
-    onReplayClick: () -> Unit,
-    onForwardClick: () -> Unit,
     onPauseToggle: () -> Unit,
     totalDuration: () -> Long,
     currentTime: () -> Long,
-    bufferedPercentage: () -> Int,
     playbackState: () -> Int,
     onSeekChanged: (timeMs: Float) -> Unit,
     is360Video: Boolean,
@@ -210,7 +201,6 @@ private fun PlayerControls(
           contentAlignment = Alignment.Center,
       ) {
         CenterControls(
-            modifier = if (is360Video) Modifier.size(64.dp) else Modifier,
             isPlaying = isPlaying,
             playbackState = playbackState,
         )
@@ -225,9 +215,7 @@ private fun PlayerControls(
                   ),
           totalDuration = totalDuration,
           currentTime = currentTime,
-          bufferedPercentage = bufferedPercentage,
-          onSeekChanged = onSeekChanged,
-      )
+          onSeekChanged = onSeekChanged)
     }
   }
 }
@@ -247,7 +235,6 @@ private fun TopControl(modifier: Modifier = Modifier, title: () -> String?) {
 
 @Composable
 private fun CenterControls(
-    modifier: Modifier = Modifier,
     isPlaying: () -> Boolean,
     playbackState: () -> Int,
 ) {
@@ -281,60 +268,24 @@ private fun BottomControls(
     modifier: Modifier = Modifier,
     totalDuration: () -> Long,
     currentTime: () -> Long,
-    bufferedPercentage: () -> Int,
-    onSeekChanged: (timeMs: Float) -> Unit,
+    onSeekChanged: (timeMs: Float) -> Unit
 ) {
 
   val duration = remember(totalDuration()) { totalDuration() }
-
   val videoTime = remember(currentTime()) { currentTime() }
 
-  val buffer = remember(bufferedPercentage()) { bufferedPercentage() }
-
   Column(modifier = modifier.padding(bottom = 32.dp)) {
-    Box(modifier = Modifier.fillMaxWidth()) {
-      Slider(
-          value = buffer.toFloat(),
-          enabled = false,
-          onValueChange = { /*do nothing*/ },
-          valueRange = 0f..100f,
-          colors =
-              SliderDefaults.colors(
-                  disabledThumbColor = Color.Transparent,
-                  disabledActiveTrackColor = Color.Gray,
-              ),
-      )
-
-      Slider(
+      SpatialSliderSmall(
           modifier = Modifier.fillMaxWidth(),
-          value = videoTime.toFloat(),
-          onValueChange = onSeekChanged,
-          valueRange = 0f..duration.toFloat(),
-          colors =
-              SliderDefaults.colors(
-                  thumbColor = AppColor.White,
-                  activeTrackColor = AppColor.White,
-                  inactiveTrackColor = AppColor.White30,
-              ),
+          value = if (duration > 0) (videoTime.toFloat() / duration.toFloat()) else 0f,
+          onChanged = {
+              onSeekChanged(it * duration.toFloat())
+          },
+          helperText = Pair(
+              videoTime.coerceAtLeast(0L).formatMinSec(),
+              duration.formatMinSec()
+          )
       )
-    }
-
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-    ) {
-      Text(
-          modifier = Modifier.padding(horizontal = 16.dp),
-          text = videoTime.coerceAtLeast(0L).formatMinSec(),
-          color = AppColor.White,
-      )
-
-      Text(
-          modifier = Modifier.padding(horizontal = 16.dp),
-          text = duration.formatMinSec(),
-          color = AppColor.White,
-      )
-    }
   }
 }
 
