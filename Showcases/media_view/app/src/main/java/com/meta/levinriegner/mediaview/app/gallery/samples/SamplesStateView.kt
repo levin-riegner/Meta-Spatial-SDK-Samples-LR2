@@ -60,20 +60,15 @@ fun SamplesStateView(
       )
     }
     is UiSamplesState.Loading -> {
-      Row(
-        modifier = modifier.padding(Dimens.medium),
-        verticalAlignment = Alignment.CenterVertically,
-      ) {
-        Text(
-          text = stringResource(R.string.sample_media_loading),
-          modifier = Modifier.weight(1f),
-          color = AppColor.White,
-        )
-        Box(Modifier.padding(Dimens.medium))
-        CircularProgressIndicator(
-          color = AppColor.White,
-        )
-      }
+      BannerView(
+        modifier = modifier,
+        label = stringResource(R.string.sample_media_loading),
+        buttons = {
+          CircularProgressIndicator(
+            color = AppColor.White,
+          )
+        }
+      )
     }
     is UiSamplesState.NewSamplesAvailable -> {
       BannerView(
@@ -102,20 +97,15 @@ fun SamplesStateView(
       )
     }
     is UiSamplesState.DownloadingSamples -> {
-      Row(
-        modifier = modifier.padding(Dimens.medium),
-        verticalAlignment = Alignment.CenterVertically,
-      ) {
-        Text(
-          text = stringResource(R.string.sample_media_downloading, state.current, state.total),
-          modifier = Modifier.weight(1f),
-          color = AppColor.White,
-        )
-        Box(Modifier.padding(Dimens.medium))
-        CircularProgressIndicator(
-          color = AppColor.White,
-        )
-      }
+      BannerView(
+        modifier = modifier,
+        label = stringResource(R.string.sample_media_downloading, state.current, state.total),
+        buttons = {
+          CircularProgressIndicator(
+            color = AppColor.White,
+          )
+        }
+      )
     }
     is UiSamplesState.DownloadError -> {
       BannerView(
