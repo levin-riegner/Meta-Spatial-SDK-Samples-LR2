@@ -40,7 +40,7 @@ android {
 
   defaultConfig {
     applicationId = "com.meta.levinriegner.mediaview"
-    minSdk = 29
+    minSdk = 30
     //noinspection ExpiredTargetSdkVersion
     targetSdk = 32
     versionCode = 22
@@ -195,10 +195,10 @@ dependencies {
   implementation("com.meta.spatial:meta-spatial-sdk:$metaSpatialSdkVersion")
   implementation("com.meta.spatial:meta-spatial-sdk-ovrmetrics:$metaSpatialSdkVersion")
   implementation("com.meta.spatial:meta-spatial-sdk-physics:$metaSpatialSdkVersion")
-  implementation("com.meta.spatial:meta-spatial-sdk-toolkit:$metaSpatialSdkVersion")
   implementation("com.meta.spatial:meta-spatial-sdk-vr:$metaSpatialSdkVersion")
   implementation("com.meta.spatial:meta-spatial-sdk-mruk:$metaSpatialSdkVersion")
   implementation("com.meta.spatial:meta-spatial-sdk-castinputforward:$metaSpatialSdkVersion")
+  implementation(files("libs/meta-spatial-sdk-uiset-release.aar"))
 
   // Meta Spatial SDK dependencies
   implementation("com.squareup.okhttp3:okhttp:4.12.0")
