@@ -107,35 +107,29 @@ class PermissionActivity : ComponentActivity() {
       val uiState = viewModel.state.collectAsState()
       // UI
       MediaViewTheme {
-        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-          Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            when (uiState.value) {
-              PermissionState.CheckPermissionState -> {
-                LoadingView(modifier = Modifier.fillMaxSize())
-              }
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+          when (uiState.value) {
+            PermissionState.CheckPermissionState -> {
+              LoadingView(modifier = Modifier.fillMaxSize())
+            }
 
-              PermissionState.RequestPermission -> {
-                RequestPermissionRationale(
-                    modifier = Modifier.padding(innerPadding),
-                    denied = false,
-                ) {
-                  requestStoragePermission()
-                }
-              }
+            PermissionState.RequestPermission -> {
+              RequestPermissionRationale(
+                  modifier = Modifier, denied = false) {
+                    requestStoragePermission()
+                  }
+            }
 
-              PermissionState.PermissionDenied -> {
-                RequestPermissionRationale(
-                    modifier = Modifier.padding(innerPadding),
-                    denied = true,
-                ) {
-                  requestStoragePermission()
-                }
-              }
+            PermissionState.PermissionDenied -> {
+              RequestPermissionRationale(
+                  modifier = Modifier, denied = true) {
+                    requestStoragePermission()
+                  }
+            }
 
-              PermissionState.PermissionAccepted -> {
-                // Do nothing, navigate to Immersive Activity
-                Box(Modifier)
-              }
+            PermissionState.PermissionAccepted -> {
+              // Do nothing, navigate to Immersive Activity
+              Box(Modifier)
             }
           }
         }
@@ -228,11 +222,8 @@ private fun RequestPermissionRationale(
       Text(
           text = stringResource(id = R.string.storage_permission_rationale_title),
           textAlign = TextAlign.Center,
-          style =
-              MaterialTheme.typography.titleMedium.copy(
-                  color = AppColor.White,
-              ),
-      )
+          style = MaterialTheme.typography.titleMedium,
+          color = AppColor.White)
       Spacer(modifier = Modifier.height(Dimens.small))
       Text(
           text =
@@ -242,11 +233,8 @@ private fun RequestPermissionRationale(
                       else R.string.storage_permission_rationale_description
               ),
           textAlign = TextAlign.Center,
-          style =
-              MaterialTheme.typography.bodyMedium.copy(
-                  color = AppColor.White,
-              ),
-      )
+          style = MaterialTheme.typography.bodyMedium,
+          color = AppColor.White)
       Spacer(modifier = Modifier.height(Dimens.large))
       BorderedButton(
         onClick = onRequest,
