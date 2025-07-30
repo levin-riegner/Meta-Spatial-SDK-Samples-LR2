@@ -161,7 +161,16 @@ private fun Header(
                   MediaSortBy.SizeDesc -> "File Size: Largest"
                   MediaSortBy.NameAsc -> "Name: A to Z"
                   MediaSortBy.NameDesc -> "Name: Z to A"
-                }
+                },
+                suffix = if (option == sortBy) {
+                  {
+                    Icon(
+                      painter = painterResource(id = R.drawable.icon_check),
+                      contentDescription = "Selected",
+                      modifier = Modifier.size(16.dp)
+                    )
+                  }
+                } else null
               )
             }
           }
