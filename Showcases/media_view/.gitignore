@@ -12,3 +12,6 @@ private/
 
 # IDEA shared
 !.idea/copyright/**
+
+keystore.jks
+app/production/release/
