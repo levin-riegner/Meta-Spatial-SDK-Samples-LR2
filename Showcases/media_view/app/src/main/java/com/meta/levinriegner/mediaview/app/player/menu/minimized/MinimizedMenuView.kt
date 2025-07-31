@@ -121,7 +121,7 @@ fun MinimizedMenuView(
       showChevron = false,
       menuModifier =
           Modifier.shadow(2.dp)
-              .border(1.dp, AppColor.MetaBlu, RoundedCornerShape(4.dp))
+              .border(1.dp, AppColor.MetaBlu, RoundedCornerShape(12.dp))
               .fillMaxWidth()
               .background(
                   Brush.verticalGradient(listOf(AppColor.GradientStart, AppColor.GradientEnd)),
