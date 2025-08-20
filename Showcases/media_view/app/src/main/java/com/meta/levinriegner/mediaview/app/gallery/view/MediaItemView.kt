@@ -50,8 +50,11 @@ import kotlinx.coroutines.flow.map
 fun MediaItemView(
     item: MediaModel,
     showMetadata: Boolean,
+    isSelectionMode: Boolean,
+    isSelected: Boolean,
     modifier: Modifier = Modifier,
     onItemClicked: (MediaModel) -> Unit,
+    onItemSelectionToggled: (Long) -> Unit,
 ) {
   val icon = item.mediaFilter?.iconResId() ?: R.drawable.icon_viewall
 
@@ -66,7 +69,13 @@ fun MediaItemView(
           modifier
               .size(Dimens.galleryItemSize)
               .clip(RoundedCornerShape(Dimens.radiusMedium))
-              .clickable { onItemClicked(item) }) {
+              .clickable { 
+                if (isSelectionMode) {
+                  onItemSelectionToggled(item.id)
+                } else {
+                  onItemClicked(item)
+                }
+              }) {
         Box(contentAlignment = Alignment.Center, modifier = Modifier) {
           AsyncImage(
               model =
@@ -224,6 +233,28 @@ fun MediaItemView(
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
+            )
+          }
+        }
+
+        // Selection check icon overlay
+        if (isSelectionMode && isSelected) {
+          Box(
+              modifier = Modifier
+                  .align(Alignment.TopEnd)
+                  .padding(8.dp)
+                  .size(24.dp)
+                  .background(
+                      color = AppColor.MetaBlu,
+                      shape = RoundedCornerShape(12.dp)
+                  ),
+              contentAlignment = Alignment.Center
+          ) {
+            Icon(
+                painter = painterResource(id = R.drawable.icon_check),
+                contentDescription = "Selected",
+                tint = AppColor.White,
+                modifier = Modifier.size(16.dp)
             )
           }
         }
