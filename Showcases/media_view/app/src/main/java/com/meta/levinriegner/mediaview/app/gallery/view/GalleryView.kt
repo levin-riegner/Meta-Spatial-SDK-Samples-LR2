@@ -29,6 +29,7 @@ import com.meta.spatial.uiset.control.SpatialSwitch
 import com.meta.spatial.uiset.control.SwitchDefaults
 import com.meta.spatial.uiset.dropdown.SpatialDropdown
 import com.meta.spatial.uiset.dropdown.foundation.SpatialDropdownItem
+import com.meta.spatial.uiset.button.BorderedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -50,9 +51,11 @@ import com.meta.levinriegner.mediaview.app.shared.theme.Dimens
 import com.meta.levinriegner.mediaview.app.shared.theme.MediaViewTheme
 import com.meta.levinriegner.mediaview.app.shared.view.ErrorView
 import com.meta.levinriegner.mediaview.app.shared.view.LoadingView
+import com.meta.levinriegner.mediaview.app.shared.view.component.DeleteConfirmationDialog
 import com.meta.levinriegner.mediaview.data.gallery.model.MediaFilter
 import com.meta.levinriegner.mediaview.data.gallery.model.MediaModel
 import com.meta.levinriegner.mediaview.data.gallery.model.MediaSortBy
+import com.meta.spatial.uiset.button.BorderedIconButton
 
 @Composable
 fun GalleryView(
@@ -60,10 +63,20 @@ fun GalleryView(
     filter: MediaFilter,
     sortBy: MediaSortBy,
     showMetadata: Boolean,
+    isSelectionMode: Boolean,
+    selectedItems: Set<Long>,
     onRefresh: () -> Unit,
     onMediaSelected: (MediaModel) -> Unit,
     onSortBy: (MediaSortBy) -> Unit,
     onToggleMetadata: (Boolean) -> Unit,
+    onToggleSelectionMode: () -> Unit,
+    onItemSelectionToggled: (Long) -> Unit,
+    onDeleteSelected: () -> Unit,
+    onOpenSelected: () -> Unit,
+    onDeleteConfirmed: () -> Unit,
+    onDeleteCancelled: () -> Unit,
+    showDeleteConfirmation: Boolean,
+    selectedItemsCount: Int,
     onOnboardingButtonPressed: () -> Unit,
 ) {
   MediaViewTheme {
@@ -73,7 +86,45 @@ fun GalleryView(
                 .border(
                     width = 1.dp,
                     color = AppColor.MetaBlu,
-                    shape = RoundedCornerShape(Dimens.radiusMedium),
+                    shape = RoundedCornerShape(Dimens.radiusMedium))
+                .clip(RoundedCornerShape(Dimens.radiusMedium))) { innerPadding ->
+          when (uiState) {
+            UiState.Idle -> Box(Modifier)
+            UiState.Loading -> LoadingView(modifier = Modifier.fillMaxSize())
+            is UiState.Success ->
+                Column(
+                    modifier = Modifier.fillMaxSize().background(AppColor.BackgroundSweep),
+                ) {
+                  Header(
+                      filter = filter,
+                      sortBy = sortBy,
+                      onSortBy = onSortBy,
+                      fileCount = uiState.data.size,
+                      showMetadata = showMetadata,
+                      isSelectionMode = isSelectionMode,
+                      selectedItems = selectedItems,
+                      onToggleMetadata = onToggleMetadata,
+                      onToggleSelectionMode = onToggleSelectionMode,
+                      onDeleteSelected = onDeleteSelected,
+                      onOpenSelected = onOpenSelected,
+                      onOnboardingButtonPressed = onOnboardingButtonPressed,
+                  )
+                  MediaGrid(
+                      media = uiState.data,
+                      showMetadata = showMetadata,
+                      isSelectionMode = isSelectionMode,
+                      selectedItems = selectedItems,
+                      modifier = Modifier.padding(innerPadding),
+                      onItemClicked = onMediaSelected,
+                      onItemSelectionToggled = onItemSelectionToggled,
+                  )
+                }
+
+            is UiState.Error ->
+                ErrorView(
+                    modifier = Modifier.fillMaxSize(),
+                    description = uiState.message,
+                    onActionButtonPressed = onRefresh,
                 )
                 .clip(RoundedCornerShape(Dimens.radiusMedium))
     ) { innerPadding ->
@@ -110,6 +161,21 @@ fun GalleryView(
       }
     }
   }
+  
+  // Delete confirmation dialog
+  if (showDeleteConfirmation) {
+    DeleteConfirmationDialog(
+        title = "Delete Confirmation",
+        description = if (selectedItemsCount == 1) {
+          "Are you sure you want to delete this item? This action cannot be undone."
+        } else {
+          "Are you sure you want to delete $selectedItemsCount items? This action cannot be undone."
+        },
+        onDelete = onDeleteConfirmed,
+        onCancel = onDeleteCancelled,
+        onDismiss = onDeleteCancelled
+    )
+  }
 }
 
 @Composable
@@ -119,7 +185,12 @@ private fun Header(
     onSortBy: (MediaSortBy) -> Unit,
     fileCount: Int,
     showMetadata: Boolean,
+    isSelectionMode: Boolean,
+    selectedItems: Set<Long>,
     onToggleMetadata: (Boolean) -> Unit,
+    onToggleSelectionMode: () -> Unit,
+    onDeleteSelected: () -> Unit,
+    onOpenSelected: () -> Unit,
     onOnboardingButtonPressed: () -> Unit,
 ) {
   Column {
@@ -148,77 +219,147 @@ private fun Header(
         Row(
             verticalAlignment = Alignment.CenterVertically,
         ) {
-          OnboardingButton(onPressed = onOnboardingButtonPressed)
-          Box(modifier = Modifier.size(Dimens.medium))
-
-          val sortByItems = remember {
-            MediaSortBy.entries.map { option ->
-              SpatialDropdownItem(
-                title = when (option) {
-                  MediaSortBy.DateDesc -> "Date Added: Earliest"
-                  MediaSortBy.DateAsc -> "Date Added: Oldest"
-                  MediaSortBy.SizeAsc -> "File Size: Smallest"
-                  MediaSortBy.SizeDesc -> "File Size: Largest"
-                  MediaSortBy.NameAsc -> "Name: A to Z"
-                  MediaSortBy.NameDesc -> "Name: Z to A"
-                },
-                suffix = if (option == sortBy) {
-                  {
-                    Icon(
-                      painter = painterResource(id = R.drawable.icon_check),
-                      contentDescription = "Selected",
-                      modifier = Modifier.size(16.dp)
-                    )
-                  }
-                } else null
-              )
-            }
+          if (!isSelectionMode) {
+            OnboardingButton(onPressed = onOnboardingButtonPressed)
+            Box(modifier = Modifier.size(Dimens.medium))
           }
-
-          SpatialDropdown(
-              modifier = Modifier.height(40.dp).width(120.dp).border(1.dp, AppColor.White15, RoundedCornerShape(Dimens.radiusXLarge)),
-              filled = false,
+          
+          if (isSelectionMode) {
+            Text(
+                text = "${selectedItems.size} of $fileCount selected",
+                style = MaterialTheme.typography.bodyMedium.copy(color = AppColor.White60),
+                modifier = Modifier.padding(end = Dimens.medium)
+            )
+          }
+          
+          BorderedButton(
+            label = if (isSelectionMode) "Cancel" else "Select",
+              onClick = {
+                onToggleSelectionMode()
+              },
               leading = {
                 Icon(
-                    painter = painterResource(id = R.drawable.icon_sortby),
-                    contentDescription = "Sort by icon",
-                    tint = AppColor.White
+                    painter = painterResource(id = R.drawable.icon_select_multiple),
+                    contentDescription = "Select multiple items",
+                    tint = AppColor.White,
+                    modifier = Modifier.size(16.dp)
                 )
               },
-              title = stringResource(id = R.string.sort_by),
-              items = sortByItems,
-              selectedItem = null,
-              showChevron = false,
-              menuModifier = Modifier
-                  .background(AppColor.BackgroundSweep)
-                  .border(1.dp, AppColor.MetaBlu, RoundedCornerShape(12.dp)),
-              showDividers = true,
-              onItemSelected = { item ->
-                val selectedSortBy = MediaSortBy.entries[sortByItems.indexOf(item)]
-                onSortBy(selectedSortBy)
-              }
+              borderColor = AppColor.White30
           )
+          
+          if (isSelectionMode) {
+            Box(modifier = Modifier.size(Dimens.medium))
+            BorderedButton(
+                label = "Open Selected",
+                onClick = {
+                    onOpenSelected()
+                },
+                leading = {
+                  Icon(
+                      painter = painterResource(id = R.drawable.icon_open_all),
+                      contentDescription = "Open all selected items",
+                      tint = AppColor.White,
+                      modifier = Modifier.size(16.dp)
+                  )
+                },
+                borderColor = AppColor.White30,
+                modifier = Modifier.height(40.dp),
+                isEnabled = selectedItems.isNotEmpty()
+            )
+            Box(modifier = Modifier.size(Dimens.medium))
+          }
+          
+          if (isSelectionMode) {
+            BorderedIconButton(
+                modifier = Modifier.size(Dimens.xLarge),
+                icon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.icon_delete),
+                        contentDescription = "Delete selected items",
+                        tint = AppColor.White,
+                    )
+                },
+                onClick = {
+                    onDeleteSelected()
+                },
+                borderColor = AppColor.White30,
+                isEnabled = selectedItems.isNotEmpty()
+            )
+          }
+          
+          if (!isSelectionMode) {
+            Box(modifier = Modifier.size(Dimens.medium))
 
-          Box(modifier = Modifier.size(Dimens.medium))
-          SpatialSwitch(
-              thumbContent = {
-                Icon(
-                    Icons.Sharp.Info,
-                    "Toggle media info",
+            val sortByItems = remember {
+              MediaSortBy.entries.map { option ->
+                SpatialDropdownItem(
+                  title = when (option) {
+                    MediaSortBy.DateDesc -> "Date Added: Earliest"
+                    MediaSortBy.DateAsc -> "Date Added: Oldest"
+                    MediaSortBy.SizeAsc -> "File Size: Smallest"
+                    MediaSortBy.SizeDesc -> "File Size: Largest"
+                    MediaSortBy.NameAsc -> "Name: A to Z"
+                    MediaSortBy.NameDesc -> "Name: Z to A"
+                  },
+                  suffix = if (option == sortBy) {
+                    {
+                      Icon(
+                        painter = painterResource(id = R.drawable.icon_check),
+                        contentDescription = "Selected",
+                        modifier = Modifier.size(16.dp)
+                      )
+                    }
+                  } else null
                 )
-              },
-              checked = showMetadata,
-              onCheckedChange = { onToggleMetadata(it) },
-              colors = SwitchDefaults.colors().copy(
-                  uncheckedThumbColor = AppColor.White60,
-                  uncheckedBorderColor = Color.Transparent,
-                  uncheckedTrackColor = AppColor.White15,
-                  checkedThumbColor = Color.White,
-                  checkedBorderColor = Color.Transparent,
-                  checkedTrackColor = AppColor.White15,
-                  checkedIconColor = AppColor.MetaBlu,
-              ),
-          )
+              }
+            }
+
+            SpatialDropdown(
+                modifier = Modifier.height(40.dp).width(120.dp).border(1.dp, AppColor.White15, RoundedCornerShape(Dimens.radiusXLarge)),
+                filled = false,
+                leading = {
+                  Icon(
+                      painter = painterResource(id = R.drawable.icon_sortby),
+                      contentDescription = "Sort by icon",
+                      tint = AppColor.White
+                  )
+                },
+                title = stringResource(id = R.string.sort_by),
+                items = sortByItems,
+                selectedItem = null,
+                showChevron = false,
+                menuModifier = Modifier
+                    .background(AppColor.BackgroundSweep)
+                    .border(1.dp, AppColor.MetaBlu, RoundedCornerShape(12.dp)),
+                showDividers = true,
+                onItemSelected = { item ->
+                  val selectedSortBy = MediaSortBy.entries[sortByItems.indexOf(item)]
+                  onSortBy(selectedSortBy)
+                }
+            )
+
+            Box(modifier = Modifier.size(Dimens.medium))
+            SpatialSwitch(
+                thumbContent = {
+                  Icon(
+                      Icons.Sharp.Info,
+                      "Toggle media info",
+                  )
+                },
+                checked = showMetadata,
+                onCheckedChange = { onToggleMetadata(it) },
+                colors = SwitchDefaults.colors().copy(
+                    uncheckedThumbColor = AppColor.White60,
+                    uncheckedBorderColor = Color.Transparent,
+                    uncheckedTrackColor = AppColor.White15,
+                    checkedThumbColor = Color.White,
+                    checkedBorderColor = Color.Transparent,
+                    checkedTrackColor = AppColor.White15,
+                    checkedIconColor = AppColor.MetaBlu,
+                ),
+            )
+          }
         }
       }
     }
@@ -231,21 +372,26 @@ private fun MediaGrid(
     media: List<MediaModel>,
     modifier: Modifier = Modifier,
     showMetadata: Boolean,
+    isSelectionMode: Boolean,
+    selectedItems: Set<Long>,
     onItemClicked: (MediaModel) -> Unit,
+    onItemSelectionToggled: (Long) -> Unit,
 ) {
   LazyVerticalGrid(
       modifier = modifier,
       contentPadding = PaddingValues(Dimens.large),
       verticalArrangement = Arrangement.spacedBy(Dimens.small),
       horizontalArrangement = Arrangement.spacedBy(Dimens.small),
-      columns = GridCells.Adaptive(Dimens.galleryItemSize),
-  ) {
-    items(media.size) { index ->
-      MediaItemView(
-          media[index],
-          showMetadata,
-          onItemClicked = onItemClicked,
-      )
-    }
-  }
+      columns = GridCells.Adaptive(Dimens.galleryItemSize)) {
+        items(media.size) { index ->
+          MediaItemView(
+              media[index],
+              showMetadata,
+              isSelectionMode = isSelectionMode,
+              isSelected = selectedItems.contains(media[index].id),
+              onItemClicked = onItemClicked,
+              onItemSelectionToggled = onItemSelectionToggled,
+          )
+        }
+      }
 }

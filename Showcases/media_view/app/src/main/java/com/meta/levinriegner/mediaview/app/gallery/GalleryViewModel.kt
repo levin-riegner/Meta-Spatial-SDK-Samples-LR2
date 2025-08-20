@@ -51,6 +51,15 @@ constructor(
   private val _showMetadata = MutableStateFlow(false)
   val showMetadata = _showMetadata.asStateFlow()
 
+  private val _isSelectionMode = MutableStateFlow(false)
+  val isSelectionMode = _isSelectionMode.asStateFlow()
+
+  private val _selectedItems = MutableStateFlow<Set<Long>>(emptySet())
+  val selectedItems = _selectedItems.asStateFlow()
+
+  private val _showDeleteConfirmation = MutableStateFlow(false)
+  val showDeleteConfirmation = _showDeleteConfirmation.asStateFlow()
+
   init {
     // Will trigger the initial load
     subscribeToFilterChanges()
@@ -76,6 +85,115 @@ constructor(
   fun onToggleMetadata(show: Boolean) {
     Timber.i("Toggling metadata to $show")
     _showMetadata.value = show
+  }
+
+  fun onToggleSelectionMode() {
+    Timber.i("Toggling selection mode")
+    val newSelectionMode = !_isSelectionMode.value
+    _isSelectionMode.value = newSelectionMode
+    if (!newSelectionMode) {
+      // Clear selection when exiting selection mode
+      _selectedItems.value = emptySet()
+    }
+  }
+
+  fun onItemSelectionToggled(itemId: Long) {
+    Timber.i("Toggling selection for item: $itemId")
+    val currentSelected = _selectedItems.value.toMutableSet()
+    if (currentSelected.contains(itemId)) {
+      currentSelected.remove(itemId)
+    } else {
+      currentSelected.add(itemId)
+    }
+    _selectedItems.value = currentSelected
+  }
+
+  fun onDeleteSelected() {
+    Timber.i("Showing delete confirmation for ${_selectedItems.value.size} selected items")
+    _showDeleteConfirmation.value = true
+  }
+
+  fun onDeleteConfirmed() {
+    Timber.i("Deleting ${_selectedItems.value.size} selected items")
+    val itemsToDelete = _selectedItems.value.toList()
+    
+    _showDeleteConfirmation.value = false
+    
+    viewModelScope.launch {
+      try {
+        // Delete selected items from repository with delays to prevent race conditions
+        itemsToDelete.forEachIndexed { index, itemId ->
+          if (index > 0) {
+            kotlinx.coroutines.delay(100) // 100ms delay between deletions
+          }
+          Timber.i("Deleting item ${index + 1}/${itemsToDelete.size}: ID=$itemId")
+          galleryRepository.deleteMedia(itemId)
+        }
+        
+        // Clear selection and exit selection mode
+        _selectedItems.value = emptySet()
+        _isSelectionMode.value = false
+        
+        // Reload media to reflect changes
+        loadMedia()
+        
+        Timber.i("Successfully deleted ${itemsToDelete.size} items")
+      } catch (t: Throwable) {
+        Timber.e("Failed to delete selected items: ${t.message}")
+        // TODO: Show error message to user
+      }
+    }
+  }
+
+  fun onDeleteCancelled() {
+    Timber.i("Delete operation cancelled")
+    _showDeleteConfirmation.value = false
+  }
+
+  fun onOpenSelected() {
+    viewModelScope.launch {
+      onOpenSelectedInternal()
+    }
+  }
+
+  private suspend fun onOpenSelectedInternal() {
+    Timber.i("Opening ${_selectedItems.value.size} selected items")
+    val selectedItemIds = _selectedItems.value.toList()
+    
+    if (selectedItemIds.isNotEmpty() && state.value is UiState.Success) {
+      val media = (state.value as UiState.Success<List<MediaModel>>).data
+      
+      // Debug: Log all selected IDs and found media items
+      Timber.i("Selected item IDs: $selectedItemIds")
+      val selectedMediaItems = mutableListOf<MediaModel>()
+      
+      // Find all selected media items
+      selectedItemIds.forEach { itemId ->
+        val mediaItem = media.find { it.id == itemId }
+        if (mediaItem != null) {
+          selectedMediaItems.add(mediaItem)
+          Timber.i("Found media item: ID=${mediaItem.id}, Name=${mediaItem.name}")
+        } else {
+          Timber.w("Media item with ID $itemId not found")
+        }
+      }
+      
+      // Open all found media items with a small delay to prevent race conditions
+      selectedMediaItems.forEachIndexed { index, item ->
+        Timber.i("Opening media item ${index + 1}/${selectedMediaItems.size}: ID=${item.id}, Name=${item.name}")
+        // Add a small delay between opening items to prevent race conditions
+        if (index > 0) {
+          kotlinx.coroutines.delay(100) // 100ms delay
+        }
+        panelDelegate.openMediaPanel(item)
+      }
+      
+      // Exit selection mode after opening items
+      _selectedItems.value = emptySet()
+      _isSelectionMode.value = false
+      
+      Timber.i("Successfully opened ${selectedMediaItems.size} media items")
+    }
   }
 
   fun loadMedia(

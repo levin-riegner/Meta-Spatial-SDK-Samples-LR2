@@ -98,6 +98,9 @@ class GalleryActivity : ComponentActivity() {
       val filter = viewModel.filter.collectAsState()
       val sortBy = viewModel.sortBy.collectAsState()
       val showMetadata = viewModel.showMetadata.collectAsState()
+      val isSelectionMode = viewModel.isSelectionMode.collectAsState()
+      val selectedItems = viewModel.selectedItems.collectAsState()
+      val showDeleteConfirmation = viewModel.showDeleteConfirmation.collectAsState()
       val samplesState = samplesViewModel.state.collectAsState()
       // UI
       Box(contentAlignment = Alignment.BottomCenter) {
@@ -106,10 +109,20 @@ class GalleryActivity : ComponentActivity() {
             filter = filter.value,
             sortBy = sortBy.value,
             showMetadata = showMetadata.value,
+            isSelectionMode = isSelectionMode.value,
+            selectedItems = selectedItems.value,
             onRefresh = { viewModel.loadMedia() },
             onMediaSelected = { viewModel.onMediaSelected(it) },
             onSortBy = { viewModel.onSortBy(it) },
             onToggleMetadata = { viewModel.onToggleMetadata(it) },
+            onToggleSelectionMode = { viewModel.onToggleSelectionMode() },
+            onItemSelectionToggled = { viewModel.onItemSelectionToggled(it) },
+            onDeleteSelected = { viewModel.onDeleteSelected() },
+            onOpenSelected = { viewModel.onOpenSelected() },
+            onDeleteConfirmed = { viewModel.onDeleteConfirmed() },
+            onDeleteCancelled = { viewModel.onDeleteCancelled() },
+            showDeleteConfirmation = showDeleteConfirmation.value,
+            selectedItemsCount = selectedItems.value.size,
             onOnboardingButtonPressed = { viewModel.onOnboardingButtonPressed() },
         )
         if (samplesState.value != UiSamplesState.Idle && filter.value == MediaFilter.SAMPLE_MEDIA)

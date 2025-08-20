@@ -14,6 +14,7 @@ import java.io.FileOutputStream
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 class GalleryRepository
 @Inject
@@ -47,6 +48,20 @@ constructor(
       withContext(dispatcher) { galleryService.setMediaFileReady(contentValues, uri) }
 
   fun setMediaFileDeleted(uri: Uri) = galleryService.setMediaFileDeleted(uri)
+
+  suspend fun deleteMedia(mediaId: Long) = withContext(dispatcher) {
+    // Get the media item to find its URI
+    val media = getMedia(MediaFilter.ALL, MediaSortBy.DateDesc)
+    val mediaItem = media.find { it.id == mediaId }
+    
+    mediaItem?.let { item ->
+      // Delete the media file
+      galleryService.setMediaFileDeleted(item.uri)
+      Timber.i("Deleted media with ID: $mediaId")
+    } ?: run {
+      Timber.w("Media item with ID $mediaId not found")
+    }
+  }
 
   suspend fun deleteSampleMedia(exceptRelativePath: String? = null) =
       withContext(dispatcher) { galleryService.deleteSampleMedia(exceptRelativePath) }

@@ -50,8 +50,11 @@ import kotlinx.coroutines.flow.map
 fun MediaItemView(
     item: MediaModel,
     showMetadata: Boolean,
+    isSelectionMode: Boolean,
+    isSelected: Boolean,
     modifier: Modifier = Modifier,
     onItemClicked: (MediaModel) -> Unit,
+    onItemSelectionToggled: (Long) -> Unit,
 ) {
   val icon = item.mediaFilter?.iconResId() ?: R.drawable.icon_viewall
 
@@ -66,21 +69,25 @@ fun MediaItemView(
           modifier
               .size(Dimens.galleryItemSize)
               .clip(RoundedCornerShape(Dimens.radiusMedium))
-              .clickable { onItemClicked(item) }
-  ) {
-    Box(contentAlignment = Alignment.Center, modifier = Modifier) {
-      AsyncImage(
-          model =
-              ImageRequest.Builder(LocalContext.current)
-                  .data(item.uri)
-                  .size(Size(1000, 1000))
-                  .crossfade(true)
-                  .build(),
-          contentDescription = item.name,
-          modifier = Modifier.fillMaxSize(),
-          contentScale = ContentScale.Crop,
-          alignment = Alignment.Center,
-      )
+              .clickable { 
+                if (isSelectionMode) {
+                  onItemSelectionToggled(item.id)
+                } else {
+                  onItemClicked(item)
+                }
+              }) {
+        Box(contentAlignment = Alignment.Center, modifier = Modifier) {
+          AsyncImage(
+              model =
+                  ImageRequest.Builder(LocalContext.current)
+                      .data(item.uri)
+                      .size(Size(1000, 1000))
+                      .crossfade(true)
+                      .build(),
+              contentDescription = item.name,
+              modifier = Modifier.fillMaxSize(),
+              contentScale = ContentScale.Crop,
+              alignment = Alignment.Center)
 
       AnimatedOpacity(visible = !showMetadata) {
         Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom) {
@@ -197,6 +204,28 @@ fun MediaItemView(
                 fontSize = 9.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Right,
+            )
+          }
+        }
+
+        // Selection check icon overlay
+        if (isSelectionMode && isSelected) {
+          Box(
+              modifier = Modifier
+                  .align(Alignment.TopEnd)
+                  .padding(8.dp)
+                  .size(24.dp)
+                  .background(
+                      color = AppColor.MetaBlu,
+                      shape = RoundedCornerShape(12.dp)
+                  ),
+              contentAlignment = Alignment.Center
+          ) {
+            Icon(
+                painter = painterResource(id = R.drawable.icon_check),
+                contentDescription = "Selected",
+                tint = AppColor.White,
+                modifier = Modifier.size(16.dp)
             )
           }
         }
