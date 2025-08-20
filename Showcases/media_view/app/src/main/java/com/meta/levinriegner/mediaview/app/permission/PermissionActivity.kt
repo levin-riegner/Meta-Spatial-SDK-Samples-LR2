@@ -52,6 +52,7 @@ import com.meta.levinriegner.mediaview.app.shared.view.LoadingView
 import com.meta.spatial.uiset.button.BorderedButton
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 import timber.log.Timber
 
 /// Hybrid Activity
@@ -59,6 +60,11 @@ import timber.log.Timber
 class PermissionActivity : ComponentActivity() {
 
   private val viewModel: PermissionViewModel by viewModels()
+  private var isRequestingPermission = false
+  
+  companion object {
+    private const val PERMISSION_CHECK_DELAY = 500L // 500ms delay for permission check
+  }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     enableEdgeToEdge()
@@ -77,10 +83,12 @@ class PermissionActivity : ComponentActivity() {
             }
 
             PermissionState.RequestPermission -> {
-              // Do nothing, handle in UI
+              // Automatically request permission instead of showing explanation popup
+              requestStoragePermission()
             }
 
             PermissionState.PermissionDenied -> {
+              // Show explanation popup only after permission is denied
               // Do nothing, handle in UI
             }
 
@@ -110,17 +118,18 @@ class PermissionActivity : ComponentActivity() {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
           when (uiState.value) {
             PermissionState.CheckPermissionState -> {
+              Timber.d("UI: Showing CheckPermissionState (Loading)")
               LoadingView(modifier = Modifier.fillMaxSize())
             }
 
             PermissionState.RequestPermission -> {
-              RequestPermissionRationale(
-                  modifier = Modifier, denied = false) {
-                    requestStoragePermission()
-                  }
+              Timber.d("UI: Showing RequestPermission (Loading)")
+              // Show loading while requesting permission
+              LoadingView(modifier = Modifier.fillMaxSize())
             }
 
             PermissionState.PermissionDenied -> {
+              Timber.d("UI: Showing PermissionDenied (Explanation Popup)")
               RequestPermissionRationale(
                   modifier = Modifier, denied = true) {
                     requestStoragePermission()
@@ -128,6 +137,7 @@ class PermissionActivity : ComponentActivity() {
             }
 
             PermissionState.PermissionAccepted -> {
+              Timber.d("UI: Showing PermissionAccepted (Navigating)")
               // Do nothing, navigate to Immersive Activity
               Box(Modifier)
             }
@@ -151,14 +161,26 @@ class PermissionActivity : ComponentActivity() {
   private val storagePermissionActivityResult =
       registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { _ ->
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-          if (Environment.isExternalStorageManager()) {
-            viewModel.onStoragePermissionGranted()
-          } else {
-            viewModel.onStoragePermissionDenied()
+          Timber.d("User returned from storage permission settings")
+          // Add a small delay to ensure the system has processed the permission change
+          // This helps prevent the double-tap issue
+          lifecycleScope.launch {
+            kotlinx.coroutines.delay(PERMISSION_CHECK_DELAY)
+            // Always check permission status when user returns from settings
+            // This ensures we show the explanation popup if permission is denied
+            val hasPermission = Environment.isExternalStorageManager()
+            Timber.d("Storage permission status after settings: $hasPermission")
+            if (hasPermission) {
+              viewModel.onStoragePermissionGranted()
+            } else {
+              viewModel.onStoragePermissionDenied()
+            }
+            isRequestingPermission = false
           }
         } else {
           // Ignore unrecognized activity result
           Timber.w("Unexpected activity result for API < 30")
+          isRequestingPermission = false
         }
       }
 
@@ -169,23 +191,33 @@ class PermissionActivity : ComponentActivity() {
         } else {
           viewModel.onStoragePermissionDenied()
         }
+        isRequestingPermission = false
       }
 
   private fun requestStoragePermission() {
+    // Prevent multiple simultaneous permission requests
+    if (isRequestingPermission) {
+      Timber.d("Permission request already in progress, skipping")
+      return
+    }
+    
+    isRequestingPermission = true
+    
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
       // Android API 30+ requires manual approval through system settings
       try {
-        // Launch intent to open system settings
+        // Launch intent to open system settings using the activity result launcher
         val intent =
             Intent(
                     Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
                     Uri.fromParts("package", packageName, null),
                 )
                 .addCategory(Intent.CATEGORY_DEFAULT)
-        startActivity(intent)
+        // Only use the activity result launcher, don't call startActivity separately
         storagePermissionActivityResult.launch(intent)
       } catch (e: Exception) {
         Timber.e(e, "Failed to launch permission request")
+        isRequestingPermission = false
         viewModel.onStoragePermissionDenied()
       }
     } else {
