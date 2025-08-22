@@ -3,6 +3,7 @@
 package com.meta.levinriegner.mediaview.app.gallery.view
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -238,25 +239,43 @@ fun MediaItemView(
         }
 
         // Selection check icon overlay
-        if (isSelectionMode && isSelected) {
+        if (isSelectionMode) {
           Box(
               modifier = Modifier
                   .align(Alignment.TopEnd)
                   .padding(8.dp)
-                  .size(24.dp)
+                  .size(14.dp)
                   .background(
-                      color = AppColor.MetaBlu,
-                      shape = RoundedCornerShape(12.dp)
+                      color = if (isSelected) AppColor.MetaBlu else Color.Transparent,
+                      shape = RoundedCornerShape(4.dp)
+                  )
+                  .border(
+                      width = 1.dp,
+                      color = AppColor.White,
+                      shape = RoundedCornerShape(2.dp)
                   ),
               contentAlignment = Alignment.Center
           ) {
-            Icon(
-                painter = painterResource(id = R.drawable.icon_check),
-                contentDescription = "Selected",
-                tint = AppColor.White,
-                modifier = Modifier.size(16.dp)
-            )
+            if (isSelected) {
+              Icon(
+                  painter = painterResource(id = R.drawable.icon_check),
+                  contentDescription = "Selected",
+                  tint = AppColor.White,
+                  modifier = Modifier.size(12.dp)
+              )
+            }
           }
+        }
+
+        if (isSelectionMode && isSelected) {
+          Box(
+              modifier = Modifier
+                  .matchParentSize()
+                  .background(
+                      color = Color.White.copy(alpha = 0.3f),
+                      shape = RoundedCornerShape(Dimens.radiusMedium)
+                  )
+          )
         }
       }
 }
