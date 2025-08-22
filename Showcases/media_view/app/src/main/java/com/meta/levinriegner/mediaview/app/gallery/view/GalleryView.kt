@@ -41,6 +41,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.background
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.unit.dp
 import com.meta.levinriegner.mediaview.R
 import com.meta.levinriegner.mediaview.app.gallery.filter.titleResId
@@ -129,19 +130,15 @@ fun GalleryView(
   }
   
   // Delete confirmation dialog
-  if (showDeleteConfirmation) {
-    DeleteConfirmationDialog(
-        title = "Delete Confirmation",
-        description = if (selectedItemsCount == 1) {
-          "Are you sure you want to delete this item? This action cannot be undone."
-        } else {
-          "Are you sure you want to delete $selectedItemsCount items? This action cannot be undone."
-        },
-        onDelete = onDeleteConfirmed,
-        onCancel = onDeleteCancelled,
-        onDismiss = onDeleteCancelled
-    )
-  }
+      if (showDeleteConfirmation) {
+      DeleteConfirmationDialog(
+          title = pluralStringResource(R.plurals.delete_confirmation_title, selectedItemsCount),
+          description = pluralStringResource(R.plurals.delete_confirmation_description, selectedItemsCount, selectedItemsCount),
+          onDelete = onDeleteConfirmed,
+          onCancel = onDeleteCancelled,
+          onDismiss = onDeleteCancelled
+      )
+    }
 }
 
 @Composable
