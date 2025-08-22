@@ -150,51 +150,7 @@ constructor(
     _showDeleteConfirmation.value = false
   }
 
-  fun onOpenSelected() {
-    viewModelScope.launch {
-      onOpenSelectedInternal()
-    }
-  }
 
-  private suspend fun onOpenSelectedInternal() {
-    Timber.i("Opening ${_selectedItems.value.size} selected items")
-    val selectedItemIds = _selectedItems.value.toList()
-    
-    if (selectedItemIds.isNotEmpty() && state.value is UiState.Success) {
-      val media = (state.value as UiState.Success<List<MediaModel>>).data
-      
-      // Debug: Log all selected IDs and found media items
-      Timber.i("Selected item IDs: $selectedItemIds")
-      val selectedMediaItems = mutableListOf<MediaModel>()
-      
-      // Find all selected media items
-      selectedItemIds.forEach { itemId ->
-        val mediaItem = media.find { it.id == itemId }
-        if (mediaItem != null) {
-          selectedMediaItems.add(mediaItem)
-          Timber.i("Found media item: ID=${mediaItem.id}, Name=${mediaItem.name}")
-        } else {
-          Timber.w("Media item with ID $itemId not found")
-        }
-      }
-      
-      // Open all found media items with a small delay to prevent race conditions
-      selectedMediaItems.forEachIndexed { index, item ->
-        Timber.i("Opening media item ${index + 1}/${selectedMediaItems.size}: ID=${item.id}, Name=${item.name}")
-        // Add a small delay between opening items to prevent race conditions
-        if (index > 0) {
-          kotlinx.coroutines.delay(100) // 100ms delay
-        }
-        panelDelegate.openMediaPanel(item)
-      }
-      
-      // Exit selection mode after opening items
-      _selectedItems.value = emptySet()
-      _isSelectionMode.value = false
-      
-      Timber.i("Successfully opened ${selectedMediaItems.size} media items")
-    }
-  }
 
   fun loadMedia(
       filter: MediaFilter = this.filter.value,

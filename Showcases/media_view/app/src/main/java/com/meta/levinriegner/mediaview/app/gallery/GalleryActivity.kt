@@ -117,7 +117,6 @@ class GalleryActivity : ComponentActivity() {
             onToggleSelectionMode = { viewModel.onToggleSelectionMode() },
             onItemSelectionToggled = { viewModel.onItemSelectionToggled(it) },
             onDeleteSelected = { viewModel.onDeleteSelected() },
-            onOpenSelected = { viewModel.onOpenSelected() },
             onDeleteConfirmed = { viewModel.onDeleteConfirmed() },
             onDeleteCancelled = { viewModel.onDeleteCancelled() },
             showDeleteConfirmation = showDeleteConfirmation.value,

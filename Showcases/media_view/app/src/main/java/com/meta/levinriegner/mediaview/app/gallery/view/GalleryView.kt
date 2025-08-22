@@ -72,7 +72,6 @@ fun GalleryView(
     onToggleSelectionMode: () -> Unit,
     onItemSelectionToggled: (Long) -> Unit,
     onDeleteSelected: () -> Unit,
-    onOpenSelected: () -> Unit,
     onDeleteConfirmed: () -> Unit,
     onDeleteCancelled: () -> Unit,
     showDeleteConfirmation: Boolean,
@@ -106,7 +105,6 @@ fun GalleryView(
                       onToggleMetadata = onToggleMetadata,
                       onToggleSelectionMode = onToggleSelectionMode,
                       onDeleteSelected = onDeleteSelected,
-                      onOpenSelected = onOpenSelected,
                       onOnboardingButtonPressed = onOnboardingButtonPressed,
                   )
                   MediaGrid(
@@ -158,7 +156,6 @@ private fun Header(
     onToggleMetadata: (Boolean) -> Unit,
     onToggleSelectionMode: () -> Unit,
     onDeleteSelected: () -> Unit,
-    onOpenSelected: () -> Unit,
     onOnboardingButtonPressed: () -> Unit,
 ) {
   Column {
@@ -194,7 +191,7 @@ private fun Header(
           
           if (isSelectionMode) {
             Text(
-                text = "${selectedItems.size} of $fileCount selected",
+                text = "${selectedItems.size} selected",
                 style = MaterialTheme.typography.bodyMedium.copy(color = AppColor.White60),
                 modifier = Modifier.padding(end = Dimens.medium)
             )
@@ -207,8 +204,8 @@ private fun Header(
               },
               leading = {
                 Icon(
-                    painter = painterResource(id = R.drawable.icon_select_multiple),
-                    contentDescription = "Select multiple items",
+                    painter = painterResource(id = if (isSelectionMode) R.drawable.icon_close else R.drawable.icon_select_multiple),
+                    contentDescription = if (isSelectionMode) "Cancel selection" else "Select multiple items",
                     tint = AppColor.White,
                     modifier = Modifier.size(16.dp)
                 )
@@ -216,29 +213,10 @@ private fun Header(
               borderColor = AppColor.White30
           )
           
-          if (isSelectionMode) {
-            Box(modifier = Modifier.size(Dimens.medium))
-            BorderedButton(
-                label = "Open Selected",
-                onClick = {
-                    onOpenSelected()
-                },
-                leading = {
-                  Icon(
-                      painter = painterResource(id = R.drawable.icon_open_all),
-                      contentDescription = "Open all selected items",
-                      tint = AppColor.White,
-                      modifier = Modifier.size(16.dp)
-                  )
-                },
-                borderColor = AppColor.White30,
-                modifier = Modifier.height(40.dp),
-                isEnabled = selectedItems.isNotEmpty()
-            )
-            Box(modifier = Modifier.size(Dimens.medium))
-          }
+
           
           if (isSelectionMode) {
+            Box(modifier = Modifier.size(Dimens.medium))
             BorderedIconButton(
                 modifier = Modifier.size(Dimens.xLarge),
                 icon = {
