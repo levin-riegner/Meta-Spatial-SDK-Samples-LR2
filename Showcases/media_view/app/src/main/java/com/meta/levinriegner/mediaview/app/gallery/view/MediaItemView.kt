@@ -272,7 +272,7 @@ fun MediaItemView(
               modifier = Modifier
                   .matchParentSize()
                   .background(
-                      color = Color.White.copy(alpha = 0.3f),
+                      color = Color.White.copy(alpha = 0.4f),
                       shape = RoundedCornerShape(Dimens.radiusMedium)
                   )
           )

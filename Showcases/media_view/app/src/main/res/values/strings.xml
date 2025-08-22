@@ -41,6 +41,12 @@
     <string name="sort_by_size_desc">File Size: Largest</string>
     <string name="sort_by_name_asc">Name: A to Z</string>
     <string name="sort_by_name_desc">Name: Z to A</string>
+    <string name="items_selected">%1$d selected</string>
+    <string name="select">Select</string>
+    <string name="cancel">Cancel</string>
+    <string name="cancel_selection">Cancel selection</string>
+    <string name="select_multiple_items">Select multiple items</string>
+    <string name="delete_selected_items">Delete selected items</string>
     <plurals name="n_files_open">
         <item quantity="one">1 File in your Environment</item>
         <item quantity="other">%1$d Files in your Environment</item>
