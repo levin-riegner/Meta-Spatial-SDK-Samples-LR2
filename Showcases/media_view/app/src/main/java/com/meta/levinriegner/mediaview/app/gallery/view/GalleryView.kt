@@ -191,21 +191,21 @@ private fun Header(
           
           if (isSelectionMode) {
             Text(
-                text = "${selectedItems.size} selected",
+                text = stringResource(R.string.items_selected, selectedItems.size),
                 style = MaterialTheme.typography.bodyMedium.copy(color = AppColor.White60),
                 modifier = Modifier.padding(end = Dimens.medium)
             )
           }
           
           BorderedButton(
-            label = if (isSelectionMode) "Cancel" else "Select",
+            label = if (isSelectionMode) stringResource(R.string.cancel) else stringResource(R.string.select),
               onClick = {
                 onToggleSelectionMode()
               },
               leading = {
                 Icon(
                     painter = painterResource(id = if (isSelectionMode) R.drawable.icon_close else R.drawable.icon_select_multiple),
-                    contentDescription = if (isSelectionMode) "Cancel selection" else "Select multiple items",
+                    contentDescription = if (isSelectionMode) stringResource(R.string.cancel_selection) else stringResource(R.string.select_multiple_items),
                     tint = AppColor.White,
                     modifier = Modifier.size(16.dp)
                 )
@@ -222,7 +222,7 @@ private fun Header(
                 icon = {
                     Icon(
                         painter = painterResource(id = R.drawable.icon_delete),
-                        contentDescription = "Delete selected items",
+                        contentDescription = stringResource(R.string.delete_selected_items),
                         tint = AppColor.White,
                     )
                 },
