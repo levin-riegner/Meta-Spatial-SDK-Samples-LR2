@@ -95,6 +95,8 @@ constructor(
       // Clear selection when exiting selection mode
       _selectedItems.value = emptySet()
     }
+    // Notify other components about selection mode change
+    eventBus.post(FilterAppEvent.SelectionModeChanged(newSelectionMode))
   }
 
   fun onItemSelectionToggled(itemId: Long) {
@@ -133,6 +135,9 @@ constructor(
         // Clear selection and exit selection mode
         _selectedItems.value = emptySet()
         _isSelectionMode.value = false
+        
+        // Notify other components about selection mode change
+        eventBus.post(FilterAppEvent.SelectionModeChanged(false))
         
         // Reload media to reflect changes
         loadMedia()
