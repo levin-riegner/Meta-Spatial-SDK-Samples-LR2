@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -21,6 +22,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import com.meta.spatial.uiset.button.BorderedButton
+import com.meta.spatial.uiset.button.foundation.BorderedButtonDefaults
+import com.meta.spatial.uiset.button.PrimaryButton
+import com.meta.spatial.uiset.button.foundation.PrimaryButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,6 +33,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -37,7 +43,6 @@ import androidx.compose.ui.window.DialogProperties
 import com.meta.levinriegner.mediaview.R
 import com.meta.levinriegner.mediaview.app.shared.theme.AppColor
 import com.meta.levinriegner.mediaview.app.shared.theme.Dimens
-
 /**
  * Data class representing a dialog button configuration
  */
@@ -75,18 +80,19 @@ fun FlexibleDialog(
     ) {
         Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(24.dp))
-                .border(1.dp, AppColor.MetaBlu, RoundedCornerShape(24.dp))
+                .fillMaxHeight(0.9f)
+                .fillMaxWidth(0.9f)
+                .clip(RoundedCornerShape(16.dp))
+                .border(1.dp, AppColor.MetaBlu, RoundedCornerShape(16.dp))
                 .background(
                     Brush.horizontalGradient(
                         listOf(
-                            Color(0xFF2A2A2A),
-                            Color(0xFF1A1A1A)
+                            AppColor.GradientStart,
+                            AppColor.GradientEnd
                         )
                     )
                 )
-                .padding(32.dp),
+                .padding(24.dp),
             contentAlignment = Alignment.Center
         ) {
             Column(
@@ -98,11 +104,11 @@ fun FlexibleDialog(
                     Icon(
                         painter = painterResource(id = it),
                         contentDescription = null,
-                        modifier = Modifier.size(64.dp),
+                        modifier = Modifier.size(48.dp),
                         tint = AppColor.White
                     )
                     
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
                 
                 // Title
@@ -112,91 +118,86 @@ fun FlexibleDialog(
                     fontWeight = FontWeight.Bold,
                     color = AppColor.White,
                     textAlign = TextAlign.Center,
-                    fontSize = 20.sp
+                    lineHeight = 24.sp,
+                    fontSize = 24.sp
                 )
                 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(12.dp))
                 
                 // Description
                 Text(
                     text = description,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = AppColor.White.copy(alpha = 0.8f),
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.Medium,
+                    color = AppColor.White60,
                     textAlign = TextAlign.Center,
-                    fontSize = 16.sp
+                    // fontSize = 16.sp
                 )
                 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(16.dp))
                 
                 // Buttons
                 if (secondaryButton != null) {
-                    // Two buttons side by side
-                    Row(
+                    
+                    val buttonColors = PrimaryButtonDefaults.colors(
+                        backgroundColor = AppColor.MetaBlu,
+                        foregroundColor = AppColor.MetaBlu
+                    )
+                    // Two buttons in a column
+                    Column(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
-                        // Secondary button (left)
-                        OutlinedButton(
-                            onClick = secondaryButton.onClick,
-                            modifier = Modifier.weight(1f),
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                contentColor = if (secondaryButton.isDestructive) Color.Red else AppColor.White
+                        // Primary button (top)
+                        PrimaryButton(
+                            label = primaryButton.text,
+                            colors = PrimaryButtonDefaults.colors(
+                                backgroundColor = AppColor.MetaBlu,
+                                foregroundColor = AppColor.White
                             ),
-                            border = androidx.compose.foundation.BorderStroke(
-                                1.dp,
-                                if (secondaryButton.isDestructive) Color.Red else AppColor.MetaBlu
+                            labelTextStyle = TextStyle(
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.SemiBold
                             ),
-                            shape = RoundedCornerShape(12.dp)
-                        ) {
-                            Text(
-                                text = secondaryButton.text,
-                                fontWeight = FontWeight.Medium,
-                                fontSize = 16.sp
-                            )
-                        }
-                        
-                        // Primary button (right)
-                        Button(
                             onClick = primaryButton.onClick,
-                            modifier = Modifier.weight(1f),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = when {
-                                    primaryButton.isDestructive -> Color.Red
-                                    primaryButton.isPrimary -> AppColor.MetaBlu
-                                    else -> AppColor.MetaBlu
-                                },
-                                contentColor = AppColor.White
+                            expanded = true,
+                            modifier = Modifier.height(36.dp)
+                        )
+                        
+                        // Secondary button (bottom)
+                        BorderedButton(
+                            label = secondaryButton.text,
+                            onClick = secondaryButton.onClick,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(36.dp),
+                            borderColor = AppColor.White60,
+                            labelTextStyle = TextStyle(
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.SemiBold
                             ),
-                            shape = RoundedCornerShape(12.dp)
-                        ) {
-                            Text(
-                                text = primaryButton.text,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 16.sp
-                            )
-                        }
+                            colors = BorderedButtonDefaults.colors(
+                                foregroundColor = if (secondaryButton.isDestructive) Color.Red else AppColor.White
+                            ),
+                            expanded = true
+                        )
                     }
                 } else {
                     // Single button
-                    Button(
-                        onClick = primaryButton.onClick,
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = when {
-                                primaryButton.isDestructive -> Color.Red
-                                primaryButton.isPrimary -> AppColor.MetaBlu
-                                else -> AppColor.MetaBlu
-                            },
-                            contentColor = AppColor.White
+                    PrimaryButton(
+                        label = primaryButton.text,
+                        colors = PrimaryButtonDefaults.colors(
+                            backgroundColor = AppColor.MetaBlu,
+                            foregroundColor = AppColor.White
                         ),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Text(
-                            text = primaryButton.text,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 16.sp
-                        )
-                    }
+                        labelTextStyle = TextStyle(
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.SemiBold
+                        ),
+                        onClick = primaryButton.onClick,
+                        expanded = true,
+                        modifier = Modifier.height(36.dp)
+                    )
                 }
             }
         }
