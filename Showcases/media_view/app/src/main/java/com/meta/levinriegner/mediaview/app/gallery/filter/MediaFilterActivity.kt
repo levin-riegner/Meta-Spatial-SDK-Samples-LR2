@@ -41,7 +41,9 @@ import com.meta.levinriegner.mediaview.app.shared.theme.Dimens
 import com.meta.levinriegner.mediaview.app.shared.theme.MediaViewTheme
 import dagger.hilt.android.AndroidEntryPoint
 import com.meta.spatial.uiset.navigation.SpatialSideNavItem
+import com.meta.spatial.uiset.navigation.foundation.SideNavItemDefaults
 import com.meta.spatial.uiset.button.BorderedButton
+import com.meta.spatial.uiset.button.foundation.BorderedButtonDefaults
 
 @AndroidEntryPoint
 class MediaFilterActivity : ComponentActivity() {
@@ -58,6 +60,7 @@ class MediaFilterActivity : ComponentActivity() {
     setContent {
       // Observables
       val filters = viewModel.filters.collectAsState()
+      val isSelectionMode = viewModel.isSelectionMode.collectAsState()
       // UI
       MediaViewTheme {
         Column(
@@ -69,6 +72,7 @@ class MediaFilterActivity : ComponentActivity() {
         ) {
             FilterList(
                 pickerFilter = filters.value,
+                isSelectionMode = isSelectionMode.value,
                 onFilterSelected = { viewModel.onFilterSelected(it) },
                 onUpload = { viewModel.onUpload() }
             )
@@ -81,6 +85,7 @@ class MediaFilterActivity : ComponentActivity() {
 @Composable
 private fun FilterList(
     pickerFilter: List<UiMediaFilter>,
+    isSelectionMode: Boolean,
     onFilterSelected: (UiMediaFilter) -> Unit,
     onUpload: () -> Unit,
 ) {
@@ -91,6 +96,7 @@ private fun FilterList(
         modifier = Modifier.fillMaxWidth(),
     ) {
         items(pickerFilter) { filter ->
+            val isDisabled = isSelectionMode && !filter.isSelected
             SpatialSideNavItem(
                 modifier = Modifier
                     .padding(horizontal = 10.dp, vertical = 20.dp)
@@ -101,18 +107,29 @@ private fun FilterList(
                     Icon(
                         painter = painterResource(id = filter.type.iconResId()),
                         contentDescription = "Button Icon",
+                        tint = if (isDisabled) AppColor.White60 else AppColor.White,
                         modifier = Modifier
                             .size(128.dp)
                             .padding(end = Dimens.xLarge)
                     )
                 },
-                onClick = { onFilterSelected(filter) },
+                onClick = { if (!isDisabled) onFilterSelected(filter) },
                 primaryLabel = stringResource(filter.type.titleResId()),
                 selected = filter.isSelected,
                 showExpandedIcon = true,
                 dense = false,
-                primaryTextStyle = TextStyle(fontSize = 35.sp, fontWeight = FontWeight.Bold),
+                primaryTextStyle = TextStyle(
+                    fontSize = 35.sp, 
+                    fontWeight = FontWeight.Bold
+                ),
                 selectedBackgroundColor = AppColor.ButtonSelect,
+                colors = if (isDisabled) {
+                    SideNavItemDefaults.colors(
+                        unselectedPrimaryColor = AppColor.White60
+                    )
+                } else {
+                    SideNavItemDefaults.colors()
+                }
             )
         }
     }
@@ -133,24 +150,37 @@ private fun FilterList(
                   .height(96.dp)
                   .fillMaxWidth(),
           label = stringResource(R.string.add_media),
-          onClick = { onUpload() },
-          borderColor = AppColor.White60,
-          labelTextStyle = TextStyle(fontSize = 35.sp, fontWeight = FontWeight.Bold),
+          onClick = { if (!isSelectionMode) onUpload() },
+          borderColor = if (isSelectionMode) AppColor.White30 else AppColor.White60,
+          labelTextStyle = TextStyle(
+              fontSize = 35.sp, 
+              fontWeight = FontWeight.Bold,
+          ),
           expanded = true,
           leading = {
             Row {
               Icon(
                   painter = painterResource(id = R.drawable.icon_upload),
                   contentDescription = stringResource(R.string.add_media),
+                  tint = if (isSelectionMode) AppColor.White60 else AppColor.White,
                   modifier = Modifier
                       .size(84.dp)
-                      .padding(start = 0.dp, end = 0.dp),
+                      .padding(start = 0.dp, end = 0.dp)
               )
               Spacer(modifier = Modifier.width(40.dp))
 
             }
           },
           contentAlignment = Alignment.Start,
+          colors = if (isSelectionMode) {
+              // Use custom colors for disabled state - foregroundColor controls text color
+              BorderedButtonDefaults.colors(
+                  foregroundColor = AppColor.White60
+              )
+          } else {
+              // Use default colors for enabled state
+              BorderedButtonDefaults.colors()
+          }
       )
   }
 }

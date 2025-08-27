@@ -163,7 +163,7 @@ private fun Header(
       ) {
         Column {
           Text(
-              text = stringResource(filter.titleResId()),
+              text = if (isSelectionMode) stringResource(R.string.select_media_delete) else stringResource(filter.titleResId()),
               style = MaterialTheme.typography.titleMedium,
           )
           Spacer(Modifier.size(Dimens.xSmall))
