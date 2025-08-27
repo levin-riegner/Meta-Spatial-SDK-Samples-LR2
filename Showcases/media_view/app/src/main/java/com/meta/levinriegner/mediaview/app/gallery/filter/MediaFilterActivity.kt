@@ -154,7 +154,7 @@ private fun FilterList(
           borderColor = if (isSelectionMode) AppColor.White30 else AppColor.White60,
           labelTextStyle = TextStyle(
               fontSize = 35.sp, 
-              fontWeight = FontWeight.Bold,
+                fontWeight = FontWeight.Bold
           ),
           expanded = true,
           leading = {
