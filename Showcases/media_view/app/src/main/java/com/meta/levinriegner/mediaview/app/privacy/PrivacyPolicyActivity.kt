@@ -35,16 +35,16 @@ class PrivacyPolicyActivity : ComponentActivity() {
   private fun buildUi() {
     setContent {
       MediaViewTheme {
-        Box(
-            modifier =
-                Modifier.fillMaxSize()
-                    .border(1.dp, AppColor.MetaBlu, RoundedCornerShape(Dimens.radiusMedium))
-                    .clip(RoundedCornerShape(Dimens.radiusMedium))) {
-              PrivacyPolicyView(
-                  modifier = Modifier.fillMaxSize().background(AppColor.BackgroundSweep),
-                  onAccepted = { viewModel.acceptPrivacyPolicy() },
-              )
-            }
+        // Box(
+        //     modifier =
+        //         Modifier.fillMaxSize()
+        //             .border(1.dp, AppColor.MetaBlu, RoundedCornerShape(Dimens.radiusMedium))
+        //             .clip(RoundedCornerShape(Dimens.radiusMedium))) {
+        //       PrivacyPolicyView(
+        //           modifier = Modifier.fillMaxSize().background(AppColor.BackgroundSweep),
+        //           onAccepted = { viewModel.acceptPrivacyPolicy() },
+        //       )
+        //     }
       }
     }
   }

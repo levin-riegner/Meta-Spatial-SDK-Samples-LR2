@@ -4,6 +4,7 @@ package com.meta.levinriegner.mediaview.app.onboarding.view
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -32,18 +33,22 @@ fun OnboardingControls(
       modifier = Modifier.fillMaxSize(),
       horizontalArrangement = Arrangement.SpaceBetween,
       verticalAlignment = Alignment.CenterVertically) {
-        BorderedIconButton(
-            icon = {
-                Icon(
-                    Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Go to previous step",
-                    tint = AppColor.White,
-                )
-            },
-            modifier = Modifier.size(Dimens.large),
-            borderColor = AppColor.White30,
-            onClick = onPreviousButtonPressed
-        )
+        if (currentStep > 1) {
+            BorderedIconButton(
+                icon = {
+                    Icon(
+                        Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Go to previous step",
+                        tint = AppColor.White,
+                    )
+                },
+                modifier = Modifier.size(Dimens.large),
+                borderColor = AppColor.White30,
+                onClick = onPreviousButtonPressed
+            )
+        } else {
+            Spacer(modifier = Modifier.size(Dimens.large))
+        }
         Text(
             "$currentStep of $totalSteps",
             style = MaterialTheme.typography.bodySmall,

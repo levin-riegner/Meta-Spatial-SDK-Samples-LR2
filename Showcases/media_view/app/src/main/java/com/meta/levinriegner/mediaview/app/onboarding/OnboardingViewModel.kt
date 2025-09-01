@@ -28,13 +28,17 @@ constructor(
 ) : ViewModel(), AppEventListener {
   private val _state = MutableStateFlow<OnboardingState>(OnboardingState.Idle)
   val state = _state.asStateFlow()
+  
+  private val _hasAcceptedTerms = MutableStateFlow(userRepository.isPrivacyPolicyAccepted())
+  val hasAcceptedTerms = _hasAcceptedTerms.asStateFlow()
 
   init {
     eventBus.register(this)
   }
 
   private fun refreshShouldShow() {
-    val isCompleted = userRepository.isOnboardingCompleted()
+    // val isCompleted = userRepository.isOnboardingCompleted()
+    val isCompleted = false
 
     if (isCompleted) {
       Timber.i("Onboarding already completed")
@@ -49,6 +53,12 @@ constructor(
 
   fun close() {
     panelDelegate.toggleOnboarding(false)
+  }
+  
+  fun acceptTerms() {
+    Timber.i("Accept Terms of Service")
+    userRepository.setPrivacyPolicyAccepted(true)
+    _hasAcceptedTerms.value = true
   }
 
   override fun onEvent(event: AppEvent) {

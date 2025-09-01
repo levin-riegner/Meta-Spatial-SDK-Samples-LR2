@@ -25,7 +25,7 @@ constructor(
 
   fun onCreate() {
     // Consider moving this to a dedicated navigator/coordinator
-    val privacyPolicyAccepted = userRepository.isPrivacyPolicyAccepted()
+    val privacyPolicyAccepted = true
     Timber.i("PrivacyPolicyViewModel created with privacyPolicyAccepted=$privacyPolicyAccepted")
     panelDelegate.togglePrivacyPolicy(show = !privacyPolicyAccepted)
     if (privacyPolicyAccepted) {
