@@ -115,7 +115,10 @@ class PermissionActivity : ComponentActivity() {
       val uiState = viewModel.state.collectAsState()
       // UI
       MediaViewTheme {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Box(
+          modifier = Modifier.fillMaxSize().background(AppColor.BackgroundSweep), 
+          contentAlignment = Alignment.Center
+        ) {
           when (uiState.value) {
             PermissionState.CheckPermissionState -> {
               Timber.d("UI: Showing CheckPermissionState (Loading)")
