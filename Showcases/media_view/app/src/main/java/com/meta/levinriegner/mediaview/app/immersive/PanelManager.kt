@@ -63,7 +63,7 @@ class PanelManager(
 ) {
   private val zIndexMenu = 99
 
-  private val playerPanelDistance = 0.8f
+  private val playerPanelDistance = 0.9f
   private val immersiveMenuHeight = 0.1f
 
   private lateinit var galleryEntity: Entity
@@ -145,7 +145,7 @@ class PanelManager(
     val registration =
         PanelCreator(PanelRegistrationIds.media(mediaModel.id)) { ent ->
           // Set initial transform based on head pose
-          panelTransformations.applyTransform(ent, playerPanelDistance, Vector3(0f, 0f, 0f))
+          panelTransformations.applyTransform(ent, playerPanelDistance, Vector3(0f, 0.2f, 0f))
           createPlayerPanel(ent, mediaModel)
         }
 
@@ -274,7 +274,7 @@ class PanelManager(
           Entity.createPanelEntity(
               appPanelRegistration.registrationId,
               Transform.build {
-                move(0f, 1f + panelYOffset, -2f) // Adjust position relative to the gallery panel
+                move(0f, 2f + panelYOffset, -2f)
                     .then(rotateY(135f))
               },
               Grabbable(),
@@ -565,6 +565,11 @@ class PanelManager(
       return
     }
     panel.entity.setComponent(Visible(show))
+    
+    if (show) {
+      panelTransformations.applyTransform(panel.entity, 0.7f, Vector3(0f, -0.4f, 0f), applyTilt = true)
+    }
+    
     // Set media filters visibility
     getComposition()
         .tryGetNodeByName(GLXFConstants.NODE_NAME_MEDIA_FILTERS)
