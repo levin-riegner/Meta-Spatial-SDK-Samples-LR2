@@ -38,6 +38,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.meta.levinriegner.mediaview.BuildConfig
@@ -93,10 +94,6 @@ class WhatsNewActivity : ComponentActivity() {
                                 rememberAsyncImagePainter(R.drawable.logo),
                                 "logo",
                             )
-                            Box(modifier = Modifier.height(Dimens.small))
-                            RoundedButton(
-                                onClick = { uriHandler.openUri(Constants.WEBSITE_URL) },
-                                title = stringResource(R.string.visit_our_website))
                           }
                     }
 
@@ -124,7 +121,7 @@ class WhatsNewActivity : ComponentActivity() {
                       HorizontalDivider()
 
                       // Content
-                      Box(modifier = Modifier.fillMaxWidth().fillMaxHeight(.80f)) {
+                      Box(modifier = Modifier.fillMaxWidth().fillMaxHeight(.85f)) {
                         LazyVerticalStaggeredGrid(
                             columns = StaggeredGridCells.Fixed(2),
                             horizontalArrangement =
@@ -142,15 +139,18 @@ class WhatsNewActivity : ComponentActivity() {
                                       releaseNote.title,
                                       color = AppColor.White,
                                       textAlign = TextAlign.Start,
-                                      fontWeight = FontWeight.Bold,
-                                      style = MaterialTheme.typography.bodyMedium,
+                                      fontWeight = FontWeight.SemiBold,
+                                      style = MaterialTheme.typography.bodySmall,
+                                      lineHeight = 1.em,
                                   )
+                                  Box(modifier = Modifier.height(2.dp))
                                   Text(
                                       releaseNote.description,
                                       color = AppColor.White60,
                                       textAlign = TextAlign.Start,
                                       style = MaterialTheme.typography.bodySmall,
-                                      fontSize = 10.sp,
+                                      fontSize = 8.sp,
+                                      lineHeight = 1.em,
                                   )
                                 }
                               }
@@ -159,17 +159,14 @@ class WhatsNewActivity : ComponentActivity() {
 
                       HorizontalDivider()
 
-                      // Bottom bar with Checkbox
+                      Box(modifier = Modifier.fillMaxWidth().weight(1f))
+
                       Row(
-                          modifier = Modifier.fillMaxWidth().fillMaxHeight(),
+                          modifier = Modifier.fillMaxWidth().wrapContentHeight(),
                           horizontalArrangement = Arrangement.End,
                           verticalAlignment = Alignment.CenterVertically,
                       ) {
-                        Box(
-                            modifier =
-                                Modifier.padding(
-                                    horizontal = Dimens.xSmall,
-                                ))
+
 
                         RoundedButton(
                             onClick = { viewModel.close() },
