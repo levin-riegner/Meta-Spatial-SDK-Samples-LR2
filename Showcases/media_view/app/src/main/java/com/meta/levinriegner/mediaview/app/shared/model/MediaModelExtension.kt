@@ -26,6 +26,11 @@ private const val maxResolutionInPx = 20 * 1000 * 1000 // 20M, exploratory value
 
 private const val mediaPanelSpacingOffsetDp = 0
 
+// Standardized 360 media dimensions for uniformity
+// Based on typical 2D media sizes (1.2f x 0.9f default) and ensuring "head-sized" sphere
+private const val STANDARD_360_MINIMIZED_SIZE = 0.7f // Standard size for minimized 360 media
+private const val STANDARD_360_MAXIMIZED_RADIUS = 1.6f // Radius large enough to "put your head in it"
+
 private fun normalizeForMaxResolution(width: Int, height: Int): Pair<Int, Int> {
   val currentResolution = width * height
   if (currentResolution > maxResolutionInPx) {
@@ -61,6 +66,14 @@ fun MediaModel.panelWidthAndHeight(): Pair<Float, Float> {
           1.2f,
           0.9f,
       )
+}
+
+/**
+ * Returns standardized dimensions for 360 media to ensure uniformity
+ * Uses consistent size regardless of original media dimensions
+ */
+fun MediaModel.standardized360Dimensions(): Pair<Float, Float> {
+  return Pair(STANDARD_360_MINIMIZED_SIZE, STANDARD_360_MINIMIZED_SIZE)
 }
 
 fun MediaModel.textureWidthAndHeight(): Pair<Int, Int> {
@@ -118,11 +131,11 @@ fun MediaModel.minimizedPanelConfigOptions(): PanelConfigOptions {
 
     IMAGE_360 ->
         PanelConfigOptions(
-            width = min(panelWidth, panelHeight),
-            height = min(panelWidth, panelHeight),
+            width = STANDARD_360_MINIMIZED_SIZE,
+            height = STANDARD_360_MINIMIZED_SIZE,
             layoutWidthInPx = layoutWidthInPx,
             layoutHeightInPx = layoutHeightInPx,
-            layerConfig = EquirectLayerConfig(min(panelWidth, panelHeight) / 2),
+            layerConfig = EquirectLayerConfig(STANDARD_360_MINIMIZED_SIZE / 2),
             panelShader = "data/shaders/punch/punch",
             alphaMode = AlphaMode.HOLE_PUNCH,
             includeGlass = false,
@@ -130,11 +143,11 @@ fun MediaModel.minimizedPanelConfigOptions(): PanelConfigOptions {
 
     VIDEO_360 ->
         PanelConfigOptions(
-            width = min(panelWidth, panelHeight),
-            height = min(panelWidth, panelHeight),
+            width = STANDARD_360_MINIMIZED_SIZE,
+            height = STANDARD_360_MINIMIZED_SIZE,
             layoutWidthInPx = layoutWidthInPx,
             layoutHeightInPx = layoutHeightInPx,
-            layerConfig = EquirectLayerConfig(min(panelWidth, panelHeight) / 2),
+            layerConfig = EquirectLayerConfig(STANDARD_360_MINIMIZED_SIZE / 2),
             panelShader = "data/shaders/punch/punch",
             alphaMode = AlphaMode.HOLE_PUNCH,
             includeGlass = false,
@@ -196,11 +209,11 @@ fun MediaModel.maximizedPanelConfigOptions(): PanelConfigOptions {
 
     IMAGE_360 ->
         PanelConfigOptions(
-            width = panelWidth,
-            height = panelHeight,
+            width = STANDARD_360_MINIMIZED_SIZE,
+            height = STANDARD_360_MINIMIZED_SIZE,
             layoutWidthInPx = layoutWidthInPx,
             layoutHeightInPx = layoutHeightInPx,
-            layerConfig = EquirectLayerConfig(2.0f),
+            layerConfig = EquirectLayerConfig(STANDARD_360_MAXIMIZED_RADIUS),
             panelShader = "data/shaders/punch/punch",
             alphaMode = AlphaMode.HOLE_PUNCH,
             includeGlass = false,
@@ -208,11 +221,11 @@ fun MediaModel.maximizedPanelConfigOptions(): PanelConfigOptions {
 
     VIDEO_360 ->
         PanelConfigOptions(
-            width = panelWidth,
-            height = panelHeight,
+            width = STANDARD_360_MINIMIZED_SIZE,
+            height = STANDARD_360_MINIMIZED_SIZE,
             layoutWidthInPx = layoutWidthInPx,
             layoutHeightInPx = layoutHeightInPx,
-            layerConfig = EquirectLayerConfig(2.0f),
+            layerConfig = EquirectLayerConfig(STANDARD_360_MAXIMIZED_RADIUS),
             panelShader = "data/shaders/punch/punch",
             alphaMode = AlphaMode.HOLE_PUNCH,
             includeGlass = false,
@@ -232,7 +245,7 @@ fun MediaModel.maximizedBottomCenterPanelVector3(): Vector3 {
 
         IMAGE_PANORAMA -> -panelHeight - immersiveMenuHeight / 2 - mediumSpacing
         IMAGE_360,
-        VIDEO_360,
+        VIDEO_360 -> -STANDARD_360_MINIMIZED_SIZE / 2 - immersiveMenuHeight / 2 - mediumSpacing
         null -> -panelHeight
       }
   return Vector3(0.0f, immersiveMenuYOffset, 0.0f)

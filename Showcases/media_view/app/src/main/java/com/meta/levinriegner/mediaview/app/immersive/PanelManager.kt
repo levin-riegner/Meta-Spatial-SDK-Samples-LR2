@@ -22,6 +22,7 @@ import com.meta.levinriegner.mediaview.app.shared.model.maximizedBottomCenterPan
 import com.meta.levinriegner.mediaview.app.shared.model.maximizedPanelConfigOptions
 import com.meta.levinriegner.mediaview.app.shared.model.minimizedPanelConfigOptions
 import com.meta.levinriegner.mediaview.app.shared.model.panelWidthAndHeight
+import com.meta.levinriegner.mediaview.app.shared.model.standardized360Dimensions
 import com.meta.levinriegner.mediaview.app.shared.theme.Dimens
 import com.meta.levinriegner.mediaview.app.upload.UploadActivity
 import com.meta.levinriegner.mediaview.app.whatsnew.WhatsNewActivity
@@ -324,7 +325,10 @@ class PanelManager(
                     Transform.build { move(0f, 0f, 0f) },
                     Scale(2f))
                 .also { mediaModel.minimizedMenuEntityId = it.id }
-        val (playerWidth, playerHeight) = mediaModel.panelWidthAndHeight()
+        val (playerWidth, playerHeight) = when (mediaModel.mediaType) {
+            IMAGE_360, VIDEO_360 -> mediaModel.standardized360Dimensions()
+            else -> mediaModel.panelWidthAndHeight()
+        }
         val (menuWidth, menuHeight) =
             Pair(
                 dpToPx(Dimens.playerMenuTotalWidth) * PIXELS_TO_METERS,
@@ -332,13 +336,18 @@ class PanelManager(
 
         // Anchor the menu to the player panel
         popUpMenuButtonEntity.setComponent(TransformParent(playerEntity))
+        
+        // Calculate menu position based on media type
+        val menuXOffset = when (mediaModel.mediaType) {
+            IMAGE_360, VIDEO_360 -> playerWidth / 2 + menuWidth / 2 + (dpToPx(Dimens.large.value.toInt()) * PIXELS_TO_METERS)
+            else -> playerWidth / 3 + menuWidth / 2 + (dpToPx(Dimens.medium.value.toInt()) * PIXELS_TO_METERS)
+        }
+        
         popUpMenuButtonEntity.setComponent(
             Transform(
                 Pose(
                     Vector3(
-                        playerWidth / 4 +
-                            menuWidth +
-                            (dpToPx(Dimens.medium.value.toInt()) * PIXELS_TO_METERS),
+                        menuXOffset,
                         playerHeight / 4 - menuHeight / 2,
                         0f),
                     Quaternion(0f, 0f, 0f))))
