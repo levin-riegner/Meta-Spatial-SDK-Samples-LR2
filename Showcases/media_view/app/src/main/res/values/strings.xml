@@ -8,7 +8,7 @@
     <string name="refresh">Refresh</string>
     <string name="close">Close</string>
     <!-- What's New -->
-    <string name="whats_new_title">V %1$s Updates</string>
+    <string name="whats_new_title">Media View v%1$s Updates</string>
     <string name="whats_new_description">
         We\'ve made some changes to the app. Please check out the new features and bug fixes.
     </string>
