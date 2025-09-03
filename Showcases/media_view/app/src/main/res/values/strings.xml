@@ -110,6 +110,11 @@
     <string name="retry">Retry</string>
     <string name="dismiss">Dismiss</string>
     <string name="download">Download</string>
+    <string name="download_all">Download All</string>
+    <string name="sample_media_download_dialog_title">Download All Sample Media Files?</string>
+    <string name="sample_media_download_dialog_description">All sample files will be downloaded locally to your device (600Mb).</string>
+    <string name="delete_confirmation_title">Delete Confirmation</string>
+    <string name="delete_confirmation_description">Are you sure you want to delete this item?</string>
     <!-- Immersive -->
     <string
     name="immersive_mode_active_label"

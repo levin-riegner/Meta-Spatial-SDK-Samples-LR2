@@ -122,6 +122,32 @@ constructor(
     contentResolver.delete(uri, null, null)
   }
 
+  fun getMediaById(mediaId: Long): MediaStoreFileDto? {
+    val selection = "${MediaStore.Files.FileColumns._ID} = ?"
+    val selectionArgs = arrayOf(mediaId.toString())
+    
+    val cursor = contentResolver.query(
+      MediaStoreQueryBuilder.collectionUri,
+      MediaStoreQueryBuilder.allColumns,
+      selection,
+      selectionArgs,
+      null
+    )
+    
+    return cursor?.use {
+      if (it.moveToFirst()) {
+        val dto = MediaStoreFileDto.fromCursor(it)
+        if (dto.mimeType != null) {
+          dto
+        } else {
+          null
+        }
+      } else {
+        null
+      }
+    } ?: null
+  }
+
   private fun sampleMediaFolderPath(): String {
     return Environment.getExternalStorageDirectory().absolutePath +
         "/$SAVED_MEDIA_FOLDER_NAME" +

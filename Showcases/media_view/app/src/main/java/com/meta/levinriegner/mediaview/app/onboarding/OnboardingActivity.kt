@@ -129,7 +129,7 @@ class OnboardingActivity : ComponentActivity() {
                       Crossfade(targetState = currentStep, label = currentStep.title) { step ->
                         if (step.isVideo) {
                           OnboardingVideo(
-                              exoPlayer, modifier = Modifier.fillMaxHeight().fillMaxWidth(.6f))
+                              exoPlayer, modifier = Modifier.fillMaxHeight().fillMaxWidth(.6f).background(AppColor.BackgroundSweep))
                         } else {
                           Image(
                               rememberAsyncImagePainter(

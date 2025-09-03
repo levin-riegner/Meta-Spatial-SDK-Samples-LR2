@@ -48,10 +48,13 @@ constructor(
       try {
         val samples = samplesRepository.getSamplesList()
         val currentVersion = userRepository.getSampleMediaVersion()
-        Timber.i("Samples versions: remote=v${samples.version}, local=v$currentVersion")
+        val hasExistingSampleMedia = galleryRepository.hasSampleMedia()
+        Timber.i("Samples versions: remote=v${samples.version}, local=v$currentVersion, hasExisting=$hasExistingSampleMedia")
         if (currentVersion == null || currentVersion == 0) {
-          downloadSamples(samples)
-        } else if ((samples.version ?: 0) > currentVersion) {
+          // No samples downloaded yet - don't show banner, let the confirmation dialog handle it
+          _state.value = UiSamplesState.Idle
+        } else if ((samples.version ?: 0) > currentVersion && hasExistingSampleMedia) {
+          // New version available AND we have existing samples - show banner
           _state.value = UiSamplesState.NewSamplesAvailable(samples)
         } else {
           _state.value = UiSamplesState.Idle
@@ -135,6 +138,24 @@ constructor(
   fun dismissSamples() {
     Timber.i("Dismiss samples. State was: ${_state.value}")
     _state.value = UiSamplesState.Idle
+  }
+
+  fun forceDownloadSamples() {
+    Timber.i("Force downloading samples")
+    viewModelScope.launch {
+      if (!internetAvailability.isInternetAvailable()) {
+        Timber.w("No internet connection")
+        _state.value = UiSamplesState.NoInternet
+        return@launch
+      }
+      try {
+        val samples = samplesRepository.getSamplesList()
+        downloadSamples(samples)
+      } catch (e: Exception) {
+        Timber.w(e, "Failed to get samples list: ${e.message}")
+        _state.value = UiSamplesState.DownloadError(e.message ?: "Unknown error")
+      }
+    }
   }
 
   companion object {

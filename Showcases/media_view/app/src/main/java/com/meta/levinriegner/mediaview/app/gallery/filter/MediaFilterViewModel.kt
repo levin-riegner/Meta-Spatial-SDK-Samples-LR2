@@ -63,6 +63,11 @@ constructor(
         Timber.i("Selection mode changed: ${event.isSelectionMode}")
         _isSelectionMode.value = event.isSelectionMode
       }
+      is FilterAppEvent.ResetToAllFilter -> {
+        Timber.i("Resetting to ALL filter")
+        eventBus.post(FilterAppEvent.FilterChanged(MediaFilter.ALL))
+        _filters.value = _filters.value.map { it.copy(isSelected = it.type == MediaFilter.ALL) }
+      }
     }
   }
 

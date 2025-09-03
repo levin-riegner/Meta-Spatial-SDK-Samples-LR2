@@ -37,8 +37,7 @@ constructor(
   }
 
   private fun refreshShouldShow() {
-    // val isCompleted = userRepository.isOnboardingCompleted()
-    val isCompleted = false
+    val isCompleted = userRepository.isOnboardingCompleted()
 
     if (isCompleted) {
       Timber.i("Onboarding already completed")

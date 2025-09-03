@@ -16,6 +16,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.outlined.PermMedia
+import androidx.compose.material.icons.sharp.Delete
+import androidx.compose.material.icons.sharp.PermMedia
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -32,10 +37,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -43,6 +51,8 @@ import androidx.compose.ui.window.DialogProperties
 import com.meta.levinriegner.mediaview.R
 import com.meta.levinriegner.mediaview.app.shared.theme.AppColor
 import com.meta.levinriegner.mediaview.app.shared.theme.Dimens
+import com.meta.levinriegner.mediaview.app.shared.theme.MediaViewTheme
+
 /**
  * Data class representing a dialog button configuration
  */
@@ -65,6 +75,7 @@ fun FlexibleDialog(
     title: String,
     description: String,
     icon: Int? = null,
+    iconVector: ImageVector? = null,
     primaryButton: DialogButton,
     secondaryButton: DialogButton? = null,
     onDismiss: () -> Unit = {},
@@ -80,7 +91,7 @@ fun FlexibleDialog(
     ) {
         Box(
             modifier = Modifier
-                .fillMaxHeight(0.9f)
+                // .fillMaxHeight(0.9f)
                 .fillMaxWidth(0.9f)
                 .clip(RoundedCornerShape(16.dp))
                 .border(1.dp, AppColor.MetaBlu, RoundedCornerShape(16.dp))
@@ -99,16 +110,26 @@ fun FlexibleDialog(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                // Icon (optional)
-                icon?.let {
-                    Icon(
-                        painter = painterResource(id = it),
-                        contentDescription = null,
-                        modifier = Modifier.size(48.dp),
-                        tint = AppColor.White
-                    )
-                    
-                    Spacer(modifier = Modifier.height(8.dp))
+                // Icon (optional) - supports both resource ID and ImageVector
+                when {
+                    iconVector != null -> {
+                        Icon(
+                            imageVector = iconVector,
+                            contentDescription = null,
+                            modifier = Modifier.size(48.dp),
+                            tint = AppColor.White
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+                    icon != null -> {
+                        Icon(
+                            painter = painterResource(id = icon),
+                            contentDescription = null,
+                            modifier = Modifier.size(48.dp),
+                            tint = AppColor.White
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
                 }
                 
                 // Title
@@ -212,14 +233,14 @@ fun InfoDialog(
     title: String,
     description: String,
     buttonText: String = "OK",
-    icon: Int? = null,
+    icon: ImageVector? = null,
     onButtonClick: () -> Unit = {},
     onDismiss: () -> Unit = {}
 ) {
     FlexibleDialog(
         title = title,
         description = description,
-        icon = icon,
+        iconVector = icon,
         primaryButton = DialogButton(
             text = buttonText,
             onClick = onButtonClick,
@@ -230,15 +251,20 @@ fun InfoDialog(
 }
 
 /**
- * Convenience function for a confirmation dialog with two buttons
+ * Convenience function for a confirmation dialog with optional cancel button
+ * 
+ * Usage examples:
+ * - With cancel button: ConfirmationDialog(title = "...", description = "...", onConfirm = { ... })
+ * - Without cancel button: ConfirmationDialog(title = "...", description = "...", cancelText = null, onConfirm = { ... })
+ * - With icon: ConfirmationDialog(title = "...", description = "...", icon = Icons.Default.PermMedia, onConfirm = { ... })
  */
 @Composable
 fun ConfirmationDialog(
     title: String,
     description: String,
     confirmText: String = "Confirm",
-    cancelText: String = "Cancel",
-    icon: Int? = null,
+    cancelText: String? = "Cancel",
+    icon: ImageVector? = null,
     onConfirm: () -> Unit,
     onCancel: () -> Unit = {},
     onDismiss: () -> Unit = {}
@@ -246,16 +272,18 @@ fun ConfirmationDialog(
     FlexibleDialog(
         title = title,
         description = description,
-        icon = icon,
+        iconVector = icon,
         primaryButton = DialogButton(
             text = confirmText,
             onClick = onConfirm,
             isPrimary = true
         ),
-        secondaryButton = DialogButton(
-            text = cancelText,
-            onClick = onCancel
-        ),
+        secondaryButton = cancelText?.let { text ->
+            DialogButton(
+                text = text,
+                onClick = onCancel
+            )
+        },
         onDismiss = onDismiss
     )
 }
@@ -290,4 +318,35 @@ fun DeleteConfirmationDialog(
         ),
         onDismiss = onDismiss
     )
+}
+
+@Preview
+@Composable
+fun ConfirmationDialogPreview() {
+  MediaViewTheme {
+    Box(
+    ) {
+      ConfirmationDialog(
+          title = stringResource(R.string.sample_media_download_dialog_title),
+          description = stringResource(R.string.sample_media_download_dialog_description),
+          onConfirm = { },
+          icon = Icons.Outlined.PermMedia,
+      )
+    }
+  }
+}
+
+@Preview
+@Composable
+fun DeleteConfirmationDialogPreview() {
+  MediaViewTheme {
+    Box(
+    ) {
+      DeleteConfirmationDialog(
+          title = stringResource(R.string.delete_confirmation_title),
+          description = stringResource(R.string.delete_confirmation_description),
+          onDelete = { },
+      )
+    }
+  }
 }

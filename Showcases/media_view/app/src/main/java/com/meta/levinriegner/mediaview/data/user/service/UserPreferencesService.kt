@@ -16,7 +16,7 @@ constructor(
   }
 
   fun isOnboardingCompleted(): Boolean {
-    return sharedPreferences.getBoolean(KEY_IS_ONBOARDING_COMPLETED, false)
+    return sharedPreferences.getBoolean(KEY_IS_ONBOARDING_COMPLETED, false) && isPrivacyPolicyAccepted()
   }
 
   fun isPrivacyPolicyAccepted(): Boolean {

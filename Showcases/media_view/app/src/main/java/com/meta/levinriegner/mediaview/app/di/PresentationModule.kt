@@ -6,6 +6,7 @@ import android.content.Context
 import com.meta.levinriegner.mediaview.app.events.EventBus
 import com.meta.levinriegner.mediaview.app.panel.PanelDelegate
 import com.meta.levinriegner.mediaview.app.shared.util.InternetAvailability
+import com.meta.levinriegner.mediaview.app.shared.util.StorageUtils
 import com.meta.spatial.toolkit.SpatialActivityManager
 import dagger.Module
 import dagger.Provides
@@ -34,5 +35,11 @@ object PresentationModule {
   @Provides
   fun internetChecker(@ApplicationContext appContext: Context): InternetAvailability {
     return InternetAvailability(appContext)
+  }
+
+  @Singleton
+  @Provides
+  fun storageUtils(@ApplicationContext appContext: Context): StorageUtils {
+    return StorageUtils(appContext)
   }
 }

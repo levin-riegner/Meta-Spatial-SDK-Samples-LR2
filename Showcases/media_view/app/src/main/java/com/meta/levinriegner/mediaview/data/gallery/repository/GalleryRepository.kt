@@ -50,9 +50,8 @@ constructor(
   fun setMediaFileDeleted(uri: Uri) = galleryService.setMediaFileDeleted(uri)
 
   suspend fun deleteMedia(mediaId: Long) = withContext(dispatcher) {
-    // Get the media item to find its URI
-    val media = getMedia(MediaFilter.ALL, MediaSortBy.DateDesc)
-    val mediaItem = media.find { it.id == mediaId }
+    // Get the media item directly from the service without filtering
+    val mediaItem = galleryService.getMediaById(mediaId)
     
     mediaItem?.let { item ->
       // Delete the media file
@@ -72,4 +71,11 @@ constructor(
   // Saves a cropped media file to the device gallery using JPEG format
   suspend fun saveCroppedMediaFile(mediaModel: MediaModel, onWrite: (FileOutputStream) -> Unit) =
       withContext(dispatcher) { galleryService.saveCroppedMediaFile(mediaModel, onWrite) }
+
+  // Check if sample media exists by counting sample media files
+  suspend fun hasSampleMedia(): Boolean =
+      withContext(dispatcher) {
+        val sampleMedia = galleryService.getMedia(MediaFilter.SAMPLE_MEDIA, MediaSortBy.DateDesc)
+        sampleMedia.isNotEmpty()
+      }
 }

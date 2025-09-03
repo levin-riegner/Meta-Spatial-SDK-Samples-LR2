@@ -131,7 +131,7 @@ fun MediaItemView(
               modifier =
                   Modifier.fillMaxSize()
                       .padding(
-                          vertical = 6.dp,
+                          vertical = 10.dp,
                           horizontal = 8.dp,
                       ),
               horizontalAlignment = Alignment.Start,
