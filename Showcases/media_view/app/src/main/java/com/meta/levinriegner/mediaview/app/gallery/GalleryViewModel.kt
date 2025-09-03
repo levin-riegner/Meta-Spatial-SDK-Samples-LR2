@@ -13,6 +13,7 @@ import com.meta.levinriegner.mediaview.app.events.MediaPlayerEvent
 import com.meta.levinriegner.mediaview.app.events.NavigationEvent
 import com.meta.levinriegner.mediaview.app.events.UploadAppEvent
 import com.meta.levinriegner.mediaview.app.panel.PanelDelegate
+import com.meta.levinriegner.mediaview.app.shared.util.StorageUtils
 import com.meta.levinriegner.mediaview.app.shared.model.UiState
 import com.meta.levinriegner.mediaview.data.gallery.model.MediaFilter
 import com.meta.levinriegner.mediaview.data.gallery.model.MediaModel
@@ -34,6 +35,7 @@ constructor(
     private val galleryRepository: GalleryRepository,
     private val panelDelegate: PanelDelegate,
     private val eventBus: EventBus,
+    private val storageUtils: StorageUtils,
 ) : ViewModel(), AppEventListener {
 
   private val _state = MutableStateFlow<UiState<List<MediaModel>>>(UiState.Idle)
@@ -59,6 +61,9 @@ constructor(
 
   private val _showDeleteConfirmation = MutableStateFlow(false)
   val showDeleteConfirmation = _showDeleteConfirmation.asStateFlow()
+
+  private val _showSampleMediaDownloadDialog = MutableStateFlow(false)
+  val showSampleMediaDownloadDialog = _showSampleMediaDownloadDialog.asStateFlow()
 
   init {
     // Will trigger the initial load
@@ -155,6 +160,31 @@ constructor(
     _showDeleteConfirmation.value = false
   }
 
+  fun onSampleMediaDownloadConfirmed() {
+    Timber.i("Sample media download confirmed")
+    _showSampleMediaDownloadDialog.value = false
+    // Trigger the download process by checking for new samples
+    // This will be handled by the SamplesViewModel in GalleryActivity
+  }
+
+  fun onSampleMediaDownloadCancelled() {
+    Timber.i("Sample media download cancelled")
+    _showSampleMediaDownloadDialog.value = false
+    // Switch back to ALL filter since user cancelled
+    eventBus.post(FilterAppEvent.ResetToAllFilter)
+  }
+
+  fun getStorageInfoForSampleMedia(): String {
+    val availableSpace = storageUtils.getAvailableStorageSpaceFormatted()
+    val sampleMediaSize = "600 MB"
+    val hasEnoughSpace = storageUtils.hasEnoughStorageSpace(600 * 1024 * 1024) // 600MB in bytes
+    
+    return if (hasEnoughSpace) {
+      "All sample files will be downloaded locally to your device ($sampleMediaSize).\n\nAvailable storage: $availableSpace"
+    } else {
+      "All sample files will be downloaded locally to your device ($sampleMediaSize).\n\n⚠️ Warning: Available storage ($availableSpace) may not be sufficient."
+    }
+  }
 
 
   fun loadMedia(
@@ -189,7 +219,17 @@ constructor(
         viewModelScope.launch { _events.emit(GalleryEvent.UploadFailed(event.error)) }
       }
 
-      is FilterAppEvent.FilterChanged -> _filter.value = event.filter
+      is FilterAppEvent.FilterChanged -> {
+        _filter.value = event.filter
+        if (event.filter == MediaFilter.SAMPLE_MEDIA) {
+          viewModelScope.launch {
+            val hasSampleMedia = galleryRepository.hasSampleMedia()
+            if (!hasSampleMedia) {
+              _showSampleMediaDownloadDialog.value = true
+            }
+          }
+        }
+      }
 
       is MediaPlayerEvent.Deleted -> {
         if (state.value is UiState.Success) {

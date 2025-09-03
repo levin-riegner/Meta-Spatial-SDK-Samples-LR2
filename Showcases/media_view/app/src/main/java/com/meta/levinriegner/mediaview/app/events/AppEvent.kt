@@ -15,6 +15,7 @@ sealed class UploadAppEvent : AppEvent() {
 sealed class FilterAppEvent : AppEvent() {
   data class FilterChanged(val filter: MediaFilter) : FilterAppEvent()
   data class SelectionModeChanged(val isSelectionMode: Boolean) : FilterAppEvent()
+  data object ResetToAllFilter : FilterAppEvent()
 }
 
 sealed class MediaPlayerEvent : AppEvent() {
