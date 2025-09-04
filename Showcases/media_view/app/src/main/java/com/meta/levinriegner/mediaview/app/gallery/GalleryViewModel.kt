@@ -228,6 +228,9 @@ constructor(
               _showSampleMediaDownloadDialog.value = true
             }
           }
+        } else {
+          // Dismiss the dialog when switching to any other filter
+          _showSampleMediaDownloadDialog.value = false
         }
       }
 
