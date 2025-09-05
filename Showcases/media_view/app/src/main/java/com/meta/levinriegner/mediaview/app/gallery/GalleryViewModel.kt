@@ -128,6 +128,21 @@ constructor(
     
     viewModelScope.launch {
       try {
+        // Close any open media panels for items being deleted
+        val currentMedia = if (state.value is UiState.Success) {
+          (state.value as UiState.Success<List<MediaModel>>).data
+        } else {
+          emptyList()
+        }
+        
+        itemsToDelete.forEach { itemId ->
+          val mediaModel = currentMedia.find { it.id == itemId }
+          if (mediaModel != null) {
+            Timber.i("Closing media panel for item being deleted: ID=$itemId")
+            panelDelegate.closeMediaPanel(mediaModel)
+          }
+        }
+        
         // Delete selected items from repository with delays to prevent race conditions
         itemsToDelete.forEachIndexed { index, itemId ->
           if (index > 0) {

@@ -130,16 +130,16 @@ fun GalleryView(
   }
   
   // Delete confirmation dialog
-      if (showDeleteConfirmation) {
-      DeleteConfirmationDialog(
-          title = pluralStringResource(R.plurals.delete_confirmation_title, selectedItemsCount),
-          description = pluralStringResource(R.plurals.delete_confirmation_description, selectedItemsCount),
-          deleteText = pluralStringResource(R.plurals.delete_button_text, selectedItemsCount, selectedItemsCount),
-          onDelete = onDeleteConfirmed,
-          onCancel = onDeleteCancelled,
-          onDismiss = onDeleteCancelled
-      )
-    }
+  if (showDeleteConfirmation) {
+    DeleteConfirmationDialog(
+        title = pluralStringResource(R.plurals.delete_confirmation_title, selectedItemsCount),
+        description = pluralStringResource(R.plurals.delete_confirmation_description, selectedItemsCount),
+        deleteText = pluralStringResource(R.plurals.delete_button_text, selectedItemsCount, selectedItemsCount),
+        onDelete = onDeleteConfirmed,
+        onCancel = onDeleteCancelled,
+        onDismiss = onDeleteCancelled
+    )
+  }
 }
 
 @Composable
