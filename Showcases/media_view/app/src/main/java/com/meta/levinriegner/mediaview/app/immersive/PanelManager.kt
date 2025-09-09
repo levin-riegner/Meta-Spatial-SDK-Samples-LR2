@@ -2,7 +2,6 @@
 
 package com.meta.levinriegner.mediaview.app.immersive
 
-import android.content.Intent
 import android.os.Handler
 import android.os.Looper
 import com.meta.levinriegner.mediaview.BuildConfig
@@ -17,6 +16,7 @@ import com.meta.levinriegner.mediaview.app.onboarding.OnboardingActivity
 import com.meta.levinriegner.mediaview.app.player.PlayerActivity
 import com.meta.levinriegner.mediaview.app.player.menu.immersive.ImmersiveMenuActivity
 import com.meta.levinriegner.mediaview.app.player.menu.minimized.MinimizedMenuActivity
+import com.meta.levinriegner.mediaview.app.player.menu.minimized.SpatialDeleteConfirmationActivity
 import com.meta.levinriegner.mediaview.app.privacy.PrivacyPolicyActivity
 import com.meta.levinriegner.mediaview.app.shared.model.maximizedBottomCenterPanelVector3
 import com.meta.levinriegner.mediaview.app.shared.model.maximizedPanelConfigOptions
@@ -54,12 +54,16 @@ import com.meta.spatial.toolkit.Transform
 import com.meta.spatial.toolkit.TransformParent
 import com.meta.spatial.toolkit.Visible
 import com.meta.spatial.toolkit.createPanelEntity
+import android.content.Intent
+import com.meta.levinriegner.mediaview.app.events.EventBus
+import com.meta.levinriegner.mediaview.app.events.MediaPlayerEvent
 import timber.log.Timber
 
 class PanelManager(
     private val panelTransformations: PanelTransformations,
     private val scene: Scene,
     private val spatialContext: SpatialContext,
+    private val eventBus: com.meta.levinriegner.mediaview.app.events.EventBus,
 ) {
   private val zIndexMenu = 99
 
@@ -84,6 +88,9 @@ class PanelManager(
             PanelCreator(PanelRegistrationIds.WHATS_NEW) { ent -> createWhatsNewPanel(ent) },
             PanelCreator(PanelRegistrationIds.PRIVACY_POLICY) { ent ->
               createPrivacyPolicyPanel(ent)
+            },
+            PanelCreator(PanelRegistrationIds.SPATIAL_DELETE_CONFIRMATION) { ent ->
+              createSpatialDeleteConfirmationPanel(ent)
             })
 
     panelRegistrations.forEach { panelRegistration ->
@@ -246,6 +253,17 @@ class PanelManager(
             includeGlass = false,
         )
     return PanelSceneObject(scene, spatialContext, PrivacyPolicyActivity::class.java, ent, config)
+  }
+
+  private fun createSpatialDeleteConfirmationPanel(ent: Entity): PanelSceneObject {
+    val config =
+        PanelConfigOptions(
+            enableLayer = true,
+            enableTransparent = false,
+            includeGlass = false,
+        )
+
+    return PanelSceneObject(scene, spatialContext, SpatialDeleteConfirmationActivity::class.java, ent, config)
   }
 
   private fun createPlayerPanel(ent: Entity, mediaModel: MediaModel): PanelSceneObject {
@@ -602,6 +620,29 @@ class PanelManager(
     panel.entity.setComponent(Visible(show))
     // Move to the front of the gallery
     panel.entity.setComponent(Transform(Pose(Vector3(-0.09f, 0f, -0.04f), Quaternion(0f, 0f, 0f))))
+  }
+
+  fun showSpatialDeleteConfirmation(mediaModel: MediaModel) {
+    val panel = getComposition().tryGetNodeByName(GLXFConstants.NODE_NAME_SPATIAL_DELETE_CONFIRMATION)
+    if (panel?.entity == null) {
+      return
+    }
+
+    // Position the dialog in front of the user's head with LookAtHead component
+    panel.entity.setComponent(com.meta.levinriegner.mediaview.LookAtHead(zOffset = 0.7f, once = false))
+    panel.entity.setComponent(Visible(true))
+
+    // Post event to pass MediaModel to the static panel
+    eventBus.post(MediaPlayerEvent.ShowDeleteConfirmation(mediaModel))
+  }
+
+  fun hideSpatialDeleteConfirmation() {
+    val panel = getComposition().tryGetNodeByName(GLXFConstants.NODE_NAME_SPATIAL_DELETE_CONFIRMATION)
+    if (panel?.entity == null) {
+      return
+    }
+
+    panel.entity.setComponent(Visible(false))
   }
 
   fun debugPrintNodes() {

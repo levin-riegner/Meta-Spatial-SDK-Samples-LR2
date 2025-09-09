@@ -66,6 +66,13 @@
       android:theme="@style/Theme.MediaView"
     />
         <activity
+      android:name=".app.player.menu.minimized.SpatialDeleteConfirmationActivity"
+      android:allowEmbedded="true"
+      android:exported="true"
+      android:launchMode="standard"
+      android:theme="@style/Theme.MediaView"
+    />
+        <activity
       android:name=".app.gallery.menu.GalleryMenuActivity"
       android:allowEmbedded="true"
       android:exported="true"
