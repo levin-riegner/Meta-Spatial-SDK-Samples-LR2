@@ -42,4 +42,8 @@ constructor(
     // Close
     close()
   }
+
+  fun showSpatialDeleteConfirmation() {
+    panelDelegate.showSpatialDeleteConfirmation(mediaModel)
+  }
 }

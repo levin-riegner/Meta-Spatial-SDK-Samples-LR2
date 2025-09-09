@@ -14,4 +14,5 @@ object GLXFConstants {
   const val NODE_NAME_GALLERY_MENU = "galleryMenu"
   const val NODE_NAME_ONBOARDING = "onboarding"
   const val NODE_NAME_WHATS_NEW = "whatsNew"
+  const val NODE_NAME_SPATIAL_DELETE_CONFIRMATION = "spatialDeleteConfirmation"
 }

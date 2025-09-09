@@ -17,28 +17,31 @@ import com.meta.spatial.core.SpatialFeature
 import com.meta.spatial.toolkit.PanelRegistration
 import com.meta.spatial.vr.LocomotionSystem
 import com.meta.spatial.vr.VRFeature
-import com.meta.spatial.vr.VrInputSystemType
+import com.meta.levinriegner.mediaview.app.events.EventBus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import dagger.hilt.EntryPoint
+import dagger.hilt.EntryPoints
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 
 class ImmersiveActivity : ComponentAppSystemActivity(), PanelDelegate {
+
+  @EntryPoint
+  @InstallIn(SingletonComponent::class)
+  interface EventBusEntryPoint {
+    fun provideEventBus(): EventBus
+  }
 
   companion object {
     const val MAX_OPEN_MEDIA = 3
   }
 
-  // Dependencies
-  private val panelManager: PanelManager by lazy {
-    PanelManager(
-        PanelTransformations(EnvironmentEntities(), systemManager),
-        scene,
-        spatialContext,
-    )
-  }
+  private lateinit var panelManager: PanelManager
 
   // State
   private var _openMedia =
@@ -57,11 +60,29 @@ class ImmersiveActivity : ComponentAppSystemActivity(), PanelDelegate {
   }
 
   override fun registerPanels(): List<PanelRegistration> {
+    // Initialize panelManager if not already initialized
+    if (!::panelManager.isInitialized) {
+      initializePanelManager()
+    }
     return panelManager.providePanelRegistrations()
+  }
+
+  private fun initializePanelManager() {
+    // Get EventBus through EntryPoint using application context
+    val eventBus = EntryPoints.get(applicationContext, EventBusEntryPoint::class.java).provideEventBus()
+    
+    // Initialize panelManager
+    panelManager = PanelManager(
+        PanelTransformations(EnvironmentEntities(), systemManager),
+        scene,
+        spatialContext,
+        eventBus,
+    )
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    
     // Disable Locomotion
     systemManager.unregisterSystem<LocomotionSystem>()
     // Register elements
@@ -194,6 +215,16 @@ class ImmersiveActivity : ComponentAppSystemActivity(), PanelDelegate {
   override fun toggleWhatsNew(show: Boolean) {
     Timber.i("Toggling Whats New. Show: $show")
     panelManager.toggleWhatsNew(show)
+  }
+
+  override fun showSpatialDeleteConfirmation(mediaModel: MediaModel) {
+    Timber.i("Showing spatial delete confirmation for media: ${mediaModel.id}")
+    panelManager.showSpatialDeleteConfirmation(mediaModel)
+  }
+
+  override fun hideSpatialDeleteConfirmation() {
+    Timber.i("Hiding spatial delete confirmation")
+    panelManager.hideSpatialDeleteConfirmation()
   }
   // endregion
 

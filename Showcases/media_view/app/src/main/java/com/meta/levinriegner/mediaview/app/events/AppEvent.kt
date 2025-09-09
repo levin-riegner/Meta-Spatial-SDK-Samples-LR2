@@ -24,6 +24,8 @@ sealed class MediaPlayerEvent : AppEvent() {
   data class Deleted(val mediaId: Long) : MediaPlayerEvent()
 
   data object CloseAll : MediaPlayerEvent()
+
+  data class ShowDeleteConfirmation(val mediaModel: com.meta.levinriegner.mediaview.data.gallery.model.MediaModel) : MediaPlayerEvent()
 }
 
 sealed class NavigationEvent : AppEvent() {

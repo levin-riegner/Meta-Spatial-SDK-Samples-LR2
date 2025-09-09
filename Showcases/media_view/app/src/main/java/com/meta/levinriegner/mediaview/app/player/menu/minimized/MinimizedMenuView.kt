@@ -11,11 +11,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AutoDelete
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,7 +26,6 @@ import com.meta.levinriegner.mediaview.app.shared.theme.AppColor
 import com.meta.levinriegner.mediaview.app.shared.theme.Dimens
 import com.meta.spatial.uiset.dropdown.SpatialIconDropdown
 import com.meta.spatial.uiset.dropdown.foundation.SpatialDropdownItem
-import timber.log.Timber
 
 @Composable
 fun MinimizedMenuView(
@@ -37,10 +34,9 @@ fun MinimizedMenuView(
     onMaximize: () -> Unit,
     onClose: () -> Unit,
 ) {
-  val confirmingDelete = remember { mutableStateOf(false) }
 
   val menuItems =
-      remember(confirmingDelete.value) {
+      remember {
         listOf(
             SpatialDropdownItem(
                 leading = {
@@ -55,14 +51,12 @@ fun MinimizedMenuView(
             SpatialDropdownItem(
                 leading = {
                   Icon(
-                      imageVector =
-                          if (!confirmingDelete.value) Icons.Outlined.Delete
-                          else Icons.Outlined.AutoDelete,
+                      imageVector = Icons.Outlined.Delete,
                       contentDescription = null,
                       modifier = Modifier.size(30.dp),
                   )
                 },
-                title = if (!confirmingDelete.value) "Delete" else "Confirm Delete",
+                title = "Delete",
             ),
             SpatialDropdownItem(
                 leading = {
@@ -107,14 +101,7 @@ fun MinimizedMenuView(
       onItemSelected = {
         when (menuItems.indexOf(it)) {
           0 -> onMaximize()
-          1 -> {
-            if (confirmingDelete.value) {
-              onDelete()
-            } else {
-              Timber.i("Confirming delete")
-            }
-            confirmingDelete.value = !confirmingDelete.value
-          }
+          1 -> onDelete()
           2 -> onClose()
         }
       },
