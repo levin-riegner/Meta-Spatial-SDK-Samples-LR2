@@ -569,6 +569,9 @@ class PanelManager(
       mediaModel.immersiveMenuEntityId = null
     } ?: Timber.w("Immersive menu panel not found")
 
+    // Ensure spatial delete confirmation is hidden when exiting immersive
+    hideSpatialDeleteConfirmation()
+
     // Display other panels
     Query.where { has(Panel.id) }
         .eval()
@@ -583,6 +586,11 @@ class PanelManager(
                       ?.id &&
               it.id !=
                   getComposition().tryGetNodeByName(GLXFConstants.NODE_NAME_ONBOARDING)?.entity?.id
+              && it.id !=
+                  getComposition()
+                      .tryGetNodeByName(GLXFConstants.NODE_NAME_SPATIAL_DELETE_CONFIRMATION)
+                      ?.entity
+                      ?.id
         }
         .forEach { panelTransformations.setPanelVisibility(it, true) }
   }
