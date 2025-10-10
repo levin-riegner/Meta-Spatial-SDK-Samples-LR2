@@ -12,7 +12,6 @@ object PanelRegistrationIds {
   const val PANEL_BUTTON_SHELVES_LAYOUT = 8
   const val PANEL_DROPDOWNS_LAYOUT = 10
   const val PANEL_DIALOGS_LAYOUT = 11
-  const val PANEL_CARDS_LAYOUT = 12
 
   const val PANEL_HORIZON_OS_PATTERN1 = 20
   const val PANEL_HORIZON_OS_PATTERN2 = 21
