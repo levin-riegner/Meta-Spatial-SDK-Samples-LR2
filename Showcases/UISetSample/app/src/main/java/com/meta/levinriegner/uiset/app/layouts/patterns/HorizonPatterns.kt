@@ -172,12 +172,9 @@ fun HorizonPatternTwo() {
           verticalAlignment = Alignment.CenterVertically,
           horizontalArrangement = Arrangement.SpaceBetween,
       ) {
-        var query by remember { mutableStateOf("") }
-
         SpatialSearchBar(
             modifier = Modifier.fillMaxWidth(.95f),
-            query = query,
-            onQueryChange = { query = it },
+            onQueryChange = {},
             onQuerySubmit = {},
         )
 

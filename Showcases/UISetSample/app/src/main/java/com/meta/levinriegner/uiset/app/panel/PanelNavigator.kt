@@ -41,7 +41,6 @@ class PanelNavigator {
             transform.t.y +=
                 when (id) {
                   PanelRegistrationIds.PANEL_DIALOGS_LAYOUT -> 1.2f
-                  PanelRegistrationIds.PANEL_CARDS_LAYOUT -> 1.2f
 
                   PanelRegistrationIds.PANEL_VIDEO_PLAYER_PATTERN -> .9f
 
