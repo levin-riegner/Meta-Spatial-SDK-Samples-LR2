@@ -39,7 +39,7 @@ class ImmersiveActivity : ComponentAppSystemActivity(), PanelDelegate {
   }
 
   companion object {
-    const val MAX_OPEN_MEDIA = 3
+    const val MAX_OPEN_MEDIA = 5
   }
 
   private lateinit var panelManager: PanelManager
