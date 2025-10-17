@@ -11,8 +11,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -45,6 +47,7 @@ import com.meta.levinriegner.mediaview.app.shared.theme.Dimens
 import com.meta.levinriegner.mediaview.app.shared.view.component.AnimatedOpacity
 import com.meta.levinriegner.mediaview.data.gallery.model.MediaModel
 import com.meta.spatial.toolkit.SpatialActivityManager
+import com.meta.spatial.uiset.button.BorderedButton
 import kotlinx.coroutines.flow.map
 
 @Composable
@@ -56,6 +59,7 @@ fun MediaItemView(
     modifier: Modifier = Modifier,
     onItemClicked: (MediaModel) -> Unit,
     onItemSelectionToggled: (Long) -> Unit,
+    onCloseMedia: (MediaModel) -> Unit,
 ) {
   val icon = item.mediaFilter?.iconResId() ?: R.drawable.icon_viewall
 
@@ -228,12 +232,20 @@ fun MediaItemView(
               contentAlignment = Alignment.Center,
               modifier = Modifier.matchParentSize().clip(RoundedCornerShape(5.dp)),
           ) {
-            Text(
-                modifier = Modifier.padding(horizontal = 5.dp).fillMaxWidth(),
-                text = "Media in\nEnvironment",
-                fontSize = 10.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
+            BorderedButton(
+                modifier = Modifier.height(24.dp),
+                label = "Close",
+                onClick = { onCloseMedia(item) },
+                borderColor = AppColor.White,
+                labelTextStyle = TextStyle(fontSize = 12.sp),
+                leading = {
+                  Icon(
+                      painter = painterResource(id = R.drawable.icon_close),
+                      contentDescription = "Close",
+                      tint = AppColor.White,
+                      modifier = Modifier.size(16.dp),
+                  )
+                }
             )
           }
         }

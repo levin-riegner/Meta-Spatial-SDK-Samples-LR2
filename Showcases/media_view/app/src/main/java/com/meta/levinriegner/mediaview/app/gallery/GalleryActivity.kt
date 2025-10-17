@@ -119,6 +119,7 @@ class GalleryActivity : ComponentActivity() {
             selectedItems = selectedItems.value,
             onRefresh = { viewModel.loadMedia() },
             onMediaSelected = { viewModel.onMediaSelected(it) },
+            onCloseMedia = { viewModel.onCloseMedia(it) },
             onSortBy = { viewModel.onSortBy(it) },
             onToggleMetadata = { viewModel.onToggleMetadata(it) },
             onToggleSelectionMode = { viewModel.onToggleSelectionMode() },

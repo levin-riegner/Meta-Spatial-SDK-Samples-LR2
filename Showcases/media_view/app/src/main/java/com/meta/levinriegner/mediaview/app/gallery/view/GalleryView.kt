@@ -68,6 +68,7 @@ fun GalleryView(
     selectedItems: Set<Long>,
     onRefresh: () -> Unit,
     onMediaSelected: (MediaModel) -> Unit,
+    onCloseMedia: (MediaModel) -> Unit,
     onSortBy: (MediaSortBy) -> Unit,
     onToggleMetadata: (Boolean) -> Unit,
     onToggleSelectionMode: () -> Unit,
@@ -116,6 +117,7 @@ fun GalleryView(
                       modifier = Modifier.padding(innerPadding),
                       onItemClicked = onMediaSelected,
                       onItemSelectionToggled = onItemSelectionToggled,
+                      onCloseMedia = onCloseMedia,
                   )
                 }
 
@@ -165,7 +167,7 @@ private fun Header(
         Column {
           Text(
               text = if (isSelectionMode) stringResource(R.string.select_media_delete) else stringResource(filter.titleResId()),
-              style = MaterialTheme.typography.titleMedium,
+              style = MaterialTheme.typography.titleMedium.copy(color = AppColor.White),
           )
           Spacer(Modifier.size(Dimens.xSmall))
           val resources = LocalContext.current.resources
@@ -320,6 +322,7 @@ private fun MediaGrid(
     selectedItems: Set<Long>,
     onItemClicked: (MediaModel) -> Unit,
     onItemSelectionToggled: (Long) -> Unit,
+    onCloseMedia: (MediaModel) -> Unit,
 ) {
   LazyVerticalGrid(
       modifier = modifier,
@@ -335,6 +338,7 @@ private fun MediaGrid(
               isSelected = selectedItems.contains(media[index].id),
               onItemClicked = onItemClicked,
               onItemSelectionToggled = onItemSelectionToggled,
+              onCloseMedia = onCloseMedia,
           )
         }
       }

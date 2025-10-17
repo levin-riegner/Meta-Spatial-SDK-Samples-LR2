@@ -81,6 +81,12 @@ constructor(
     panelDelegate.openMediaPanel(mediaModel)
   }
 
+  fun onCloseMedia(mediaModel: MediaModel) {
+    Timber.i("Closing media: ${mediaModel.debugPrint()}")
+    Timber.d("With name: ${mediaModel.name}")
+    panelDelegate.closeMediaPanel(mediaModel)
+  }
+
   fun onSortBy(sortBy: MediaSortBy) {
     Timber.i("Sorting by: $sortBy")
     _sortBy.value = sortBy
