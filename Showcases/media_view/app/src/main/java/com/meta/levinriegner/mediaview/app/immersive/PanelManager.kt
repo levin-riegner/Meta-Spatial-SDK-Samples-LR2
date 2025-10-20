@@ -357,7 +357,7 @@ class PanelManager(
         
         // Calculate menu position based on media type
         val menuXOffset = when (mediaModel.mediaType) {
-            IMAGE_360, VIDEO_360 -> playerWidth / 2 + menuWidth / 2 + (dpToPx(Dimens.large.value.toInt()) * PIXELS_TO_METERS)
+            IMAGE_360, VIDEO_360 -> playerWidth / 2 + menuWidth * 2 + (dpToPx(Dimens.xxLarge.value.toInt()) * PIXELS_TO_METERS)
             else -> playerWidth / 3 + menuWidth / 2 + (dpToPx(Dimens.medium.value.toInt()) * PIXELS_TO_METERS)
         }
         
@@ -499,8 +499,20 @@ class PanelManager(
     when (mediaModel.mediaType) {
       VIDEO_360,
       IMAGE_360 -> {
-        immersiveMenu.setComponent(LookAtHead(once = true))
-        immersiveMenu.setComponent(Grabbable())
+        // Position in lower third of user's eyesight for 360 media
+        Handler(Looper.getMainLooper())
+            .postDelayed(
+                {
+                  immersiveMenu.setComponent(Grabbable())
+                  // Use custom positioning for 360 media to place in lower third
+                  panelTransformations.applyTransform(
+                      immersiveMenu, 
+                      0.8f, // Distance from head
+                      Vector3(0f, -0.5f, 0f), // Y offset to position lower in field of view
+                      applyTilt = true // Apply 45-degree tilt for better viewing angle
+                  )
+                },
+                100)
       }
 
       else -> {
