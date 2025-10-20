@@ -20,6 +20,5 @@ constructor(
   fun closeAll() {
     eventBus.post(MediaPlayerEvent.CloseAll)
     panelDelegate.closeAllMedia()
-    panelDelegate.hideSpatialDeleteConfirmation()
   }
 }

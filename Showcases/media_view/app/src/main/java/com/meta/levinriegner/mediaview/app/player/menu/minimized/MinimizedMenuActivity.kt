@@ -37,9 +37,6 @@ class MinimizedMenuActivity : ComponentActivity() {
               viewModel.close()
               finish()
             },
-            onDelete = {
-              viewModel.showSpatialDeleteConfirmation()
-            },
         )
       }
     }

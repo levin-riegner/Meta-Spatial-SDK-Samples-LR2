@@ -216,16 +216,6 @@ class ImmersiveActivity : ComponentAppSystemActivity(), PanelDelegate {
     Timber.i("Toggling Whats New. Show: $show")
     panelManager.toggleWhatsNew(show)
   }
-
-  override fun showSpatialDeleteConfirmation(mediaModel: MediaModel) {
-    Timber.i("Showing spatial delete confirmation for media: ${mediaModel.id}")
-    panelManager.showSpatialDeleteConfirmation(mediaModel)
-  }
-
-  override fun hideSpatialDeleteConfirmation() {
-    Timber.i("Hiding spatial delete confirmation")
-    panelManager.hideSpatialDeleteConfirmation()
-  }
   // endregion
 
 }

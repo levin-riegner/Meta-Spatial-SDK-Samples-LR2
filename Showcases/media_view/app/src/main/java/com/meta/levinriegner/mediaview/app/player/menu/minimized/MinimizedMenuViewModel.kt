@@ -33,17 +33,4 @@ constructor(
     panelDelegate.closeMediaPanel(mediaModel)
     eventBus.post(MediaPlayerEvent.Close(mediaModel.id))
   }
-
-  fun delete() {
-    // Delete
-    Timber.d("Deleting media: ${mediaModel.id}")
-    galleryRepository.setMediaFileDeleted(mediaModel.uri)
-    eventBus.post(MediaPlayerEvent.Deleted(mediaModel.id))
-    // Close
-    close()
-  }
-
-  fun showSpatialDeleteConfirmation() {
-    panelDelegate.showSpatialDeleteConfirmation(mediaModel)
-  }
 }

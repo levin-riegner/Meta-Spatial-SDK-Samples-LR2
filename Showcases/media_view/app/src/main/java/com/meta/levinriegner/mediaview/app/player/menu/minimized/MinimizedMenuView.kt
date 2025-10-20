@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -30,7 +29,6 @@ import com.meta.spatial.uiset.dropdown.foundation.SpatialDropdownItem
 @Composable
 fun MinimizedMenuView(
     modifier: Modifier = Modifier,
-    onDelete: () -> Unit,
     onMaximize: () -> Unit,
     onClose: () -> Unit,
 ) {
@@ -47,16 +45,6 @@ fun MinimizedMenuView(
                   )
                 },
                 title = "Immersive View",
-            ),
-            SpatialDropdownItem(
-                leading = {
-                  Icon(
-                      imageVector = Icons.Outlined.Delete,
-                      contentDescription = null,
-                      modifier = Modifier.size(30.dp),
-                  )
-                },
-                title = "Delete",
             ),
             SpatialDropdownItem(
                 leading = {
@@ -101,8 +89,7 @@ fun MinimizedMenuView(
       onItemSelected = {
         when (menuItems.indexOf(it)) {
           0 -> onMaximize()
-          1 -> onDelete()
-          2 -> onClose()
+          1 -> onClose()
         }
       },
       showChevron = false,

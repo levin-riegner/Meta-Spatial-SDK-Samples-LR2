@@ -26,8 +26,4 @@ interface PanelDelegate {
   fun toggleOnboarding(show: Boolean)
 
   fun toggleWhatsNew(show: Boolean)
-
-  fun showSpatialDeleteConfirmation(mediaModel: MediaModel)
-
-  fun hideSpatialDeleteConfirmation()
 }
