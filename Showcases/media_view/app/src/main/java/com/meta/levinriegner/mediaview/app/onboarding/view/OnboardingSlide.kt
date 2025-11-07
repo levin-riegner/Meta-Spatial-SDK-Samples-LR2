@@ -4,8 +4,10 @@ package com.meta.levinriegner.mediaview.app.onboarding.view
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -15,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import com.meta.levinriegner.mediaview.app.shared.theme.AppColor
+import com.meta.levinriegner.mediaview.app.shared.theme.Dimens
 
 @Composable
 fun OnboardingSlide(
@@ -22,7 +25,7 @@ fun OnboardingSlide(
     description: String,
 ) {
   Column(
-      modifier = Modifier.fillMaxHeight(fraction = .85f).fillMaxWidth(),
+      modifier = Modifier.fillMaxWidth(),
       verticalArrangement = Arrangement.Center,
       horizontalAlignment = Alignment.Start,
   ) {
@@ -31,8 +34,8 @@ fun OnboardingSlide(
         color = AppColor.White,
         textAlign = TextAlign.Start,
         fontWeight = FontWeight.Bold,
-        style = MaterialTheme.typography.titleSmall,
-    )
+        style = MaterialTheme.typography.titleSmall)
+    Spacer(modifier = Modifier.height(Dimens.xSmall))
     Text(
         description,
         color = AppColor.White60,

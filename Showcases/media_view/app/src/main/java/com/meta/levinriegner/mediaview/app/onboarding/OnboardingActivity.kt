@@ -20,7 +20,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
@@ -45,6 +47,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.meta.levinriegner.mediaview.R
 import com.meta.levinriegner.mediaview.app.onboarding.view.OnboardingControls
 import com.meta.levinriegner.mediaview.app.onboarding.view.OnboardingSlide
+import com.meta.levinriegner.mediaview.app.onboarding.view.OnboardingTermsOfService
 import com.meta.levinriegner.mediaview.app.onboarding.view.OnboardingVideo
 import com.meta.levinriegner.mediaview.app.shared.theme.AppColor
 import com.meta.levinriegner.mediaview.app.shared.theme.Dimens
@@ -124,80 +127,110 @@ class OnboardingActivity : ComponentActivity() {
                 Row(modifier = Modifier.fillMaxSize()) {
                   val currentStep = state.steps[pagerState.currentPage]
 
-                  Crossfade(targetState = currentStep, label = currentStep.title) { step ->
-                    if (step.isVideo) {
-                      OnboardingVideo(
-                          exoPlayer,
-                          modifier = Modifier.fillMaxHeight().fillMaxWidth(.75f),
-                      )
-                    } else {
-                      Image(
-                          rememberAsyncImagePainter(
-                              step.resourceId,
-                          ),
-                          "${step.title} image",
-                          modifier =
-                              Modifier.fillMaxWidth(.75f).background(AppColor.DarkBackgroundSweep),
-                      )
-                    }
-                  }
-
-                  Column(
-                      horizontalAlignment = Alignment.CenterHorizontally,
-                      verticalArrangement = Arrangement.SpaceBetween,
-                      modifier =
-                          Modifier.fillMaxSize()
-                              .background(AppColor.BackgroundSweep)
-                              .padding(Dimens.small),
-                  ) {
-
-                    // Top bar with close button
-                    Box(modifier = Modifier.align(Alignment.End)) {
-                      CloseButton(
-                          onPressed = {
-                            pagerCoroutineScope.launch { pagerState.scrollToPage(0) }
-                            viewModel.close()
-                          }
-                      )
-                    }
-
-                    val onFinishButtonPressed =
-                        if (!pagerState.canScrollForward) {
-                          {
-                            pagerCoroutineScope.launch { pagerState.scrollToPage(0) }
-                            viewModel.close()
-                          }
+                      Crossfade(targetState = currentStep, label = currentStep.title) { step ->
+                        if (step.isVideo) {
+                          OnboardingVideo(
+                              exoPlayer, modifier = Modifier.fillMaxHeight().fillMaxWidth(.6f))
                         } else {
-                          null
+                          Image(
+                              rememberAsyncImagePainter(
+                                  step.resourceId,
+                              ),
+                              "${step.title} image",
+                              modifier =
+                                  Modifier.fillMaxWidth(.6f)
+                                      .background(AppColor.DarkBackgroundSweep))
                         }
+                      }
 
-                    HorizontalPager(userScrollEnabled = false, state = pagerState) { index ->
-                      val step = state.steps[index]
+                      Column(
+                          horizontalAlignment = Alignment.CenterHorizontally,
+                          verticalArrangement = Arrangement.SpaceBetween,
+                          modifier =
+                              Modifier.fillMaxSize()
+                                  .background(AppColor.BackgroundSweep)
+                                  .padding(Dimens.small)) {
 
-                      OnboardingSlide(
-                          title = step.title,
-                          description = step.description,
-                      )
+                            val hasAcceptedTerms = viewModel.hasAcceptedTerms.collectAsState().value
+                            val onFinishButtonPressed =
+                                if (!pagerState.canScrollForward) {
+                                  {
+                                    pagerCoroutineScope.launch { pagerState.scrollToPage(0) }
+                                    viewModel.close()
+                                  }
+                                } else {
+                                  null
+                                }
+
+                            // Header section
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .fillMaxHeight(0.1f),
+                                contentAlignment = Alignment.TopEnd
+                            ) {
+                                if (hasAcceptedTerms) {
+                                    CloseButton(
+                                        onPressed = {
+                                          pagerCoroutineScope.launch { pagerState.scrollToPage(0) }
+                                          viewModel.close()
+                                        })
+                                }
+                            }
+
+                            // Content section
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .fillMaxHeight(0.6f),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                HorizontalPager(userScrollEnabled = false, state = pagerState) { index ->
+                                    val step = state.steps[index]
+                                    OnboardingSlide(
+                                        title = step.title,
+                                        description = step.description,
+                                    )
+                                }
+                            }
+
+                            // Footer section
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxHeight(0.5f)
+                                    .fillMaxWidth(),
+                                contentAlignment = Alignment.BottomCenter
+                            ) {
+                                if (pagerState.currentPage == 0 && !hasAcceptedTerms) {
+                                    OnboardingTermsOfService(
+                                        onContinue = {
+                                          viewModel.acceptTerms()
+                                          pagerCoroutineScope.launch {
+                                            pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                                          }
+                                        }
+                                    )
+                                } else {
+                                    OnboardingControls(
+                                        onPreviousButtonPressed = {
+                                          pagerCoroutineScope.launch {
+                                            pagerState.animateScrollToPage(pagerState.currentPage - 1)
+                                          }
+                                        },
+                                        onNextButtonPressed = {
+                                          pagerCoroutineScope.launch {
+                                            pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                                          }
+                                        },
+                                        onFinishButtonPressed = onFinishButtonPressed,
+                                        currentStep = pagerState.currentPage + 1,
+                                        totalSteps = pagerState.pageCount,
+                                    )
+                                }
+                            }
+                          }
                     }
-
-                    OnboardingControls(
-                        onPreviousButtonPressed = {
-                          pagerCoroutineScope.launch {
-                            pagerState.animateScrollToPage(pagerState.currentPage - 1)
-                          }
-                        },
-                        onNextButtonPressed = {
-                          pagerCoroutineScope.launch {
-                            pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                          }
-                        },
-                        onFinishButtonPressed = onFinishButtonPressed,
-                        currentStep = pagerState.currentPage + 1,
-                        totalSteps = pagerState.pageCount,
-                    )
                   }
-                }
-              }
 
               is OnboardingState.Error -> {
                 ErrorView(
