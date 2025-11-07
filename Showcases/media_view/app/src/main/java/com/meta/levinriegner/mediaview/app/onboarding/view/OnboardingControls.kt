@@ -79,23 +79,4 @@ fun OnboardingControls(
             )
         }
       }
-    } else {
-      IconButton(
-          modifier =
-              Modifier.border(width = 1.dp, color = AppColor.MetaBlu, shape = CircleShape)
-                  .size(Dimens.large),
-          colors =
-              IconButtonDefaults.iconButtonColors(
-                  contentColor = AppColor.White,
-              ),
-          onClick = onNextButtonPressed,
-      ) {
-        Icon(
-            Icons.AutoMirrored.Filled.ArrowForward,
-            contentDescription = "Go to next step",
-            modifier = Modifier.padding(Dimens.xSmall),
-        )
-      }
-    }
-  }
 }

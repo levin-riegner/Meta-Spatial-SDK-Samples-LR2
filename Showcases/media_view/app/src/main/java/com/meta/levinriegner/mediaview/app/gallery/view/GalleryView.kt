@@ -126,40 +126,8 @@ fun GalleryView(
                     description = uiState.message,
                     onActionButtonPressed = onRefresh,
                 )
-                .clip(RoundedCornerShape(Dimens.radiusMedium))
-    ) { innerPadding ->
-      when (uiState) {
-        UiState.Idle -> Box(Modifier)
-        UiState.Loading -> LoadingView(modifier = Modifier.fillMaxSize())
-        is UiState.Success ->
-            Column(
-                modifier = Modifier.fillMaxSize().background(AppColor.BackgroundSweep),
-            ) {
-              Header(
-                  filter = filter,
-                  sortBy = sortBy,
-                  onSortBy = onSortBy,
-                  fileCount = uiState.data.size,
-                  showMetadata = showMetadata,
-                  onToggleMetadata = onToggleMetadata,
-                  onOnboardingButtonPressed = onOnboardingButtonPressed,
-              )
-              MediaGrid(
-                  media = uiState.data,
-                  showMetadata = showMetadata,
-                  modifier = Modifier.padding(innerPadding),
-                  onItemClicked = onMediaSelected,
-              )
-            }
-
-        is UiState.Error ->
-            ErrorView(
-                modifier = Modifier.fillMaxSize(),
-                description = uiState.message,
-                onActionButtonPressed = onRefresh,
-            )
-      }
-    }
+          }
+        }
   }
   
   // Delete confirmation dialog
@@ -202,7 +170,7 @@ private fun Header(
         Column {
           Text(
               text = stringResource(filter.titleResId()),
-              style = MaterialTheme.typography.titleMedium.copy(color = AppColor.White),
+              style = MaterialTheme.typography.titleMedium,
           )
           Spacer(Modifier.size(Dimens.xSmall))
           val resources = LocalContext.current.resources

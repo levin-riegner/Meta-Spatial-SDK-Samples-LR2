@@ -89,121 +89,150 @@ fun MediaItemView(
               contentScale = ContentScale.Crop,
               alignment = Alignment.Center)
 
-      AnimatedOpacity(visible = !showMetadata) {
-        Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom) {
-          Row(
+          AnimatedOpacity(visible = !showMetadata) {
+            Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom) {
+              Row(
+                  modifier =
+                      Modifier.wrapContentSize()
+                          .padding(
+                              vertical = 6.dp,
+                              horizontal = 8.dp,
+                          ),
+                  horizontalArrangement = Arrangement.SpaceBetween,
+                  verticalAlignment = Alignment.CenterVertically,
+              ) {
+                Icon(
+                    painter = painterResource(id = icon),
+                    contentDescription = "Button Icon",
+                    modifier = Modifier.size(18.dp))
+
+                item.durationHMS()?.let {
+                  val duration =
+                      (it.first.takeIf { it > 0 }?.let { h -> "${h}:" } ?: "") +
+                          it.second.let { m -> "${m}:" } +
+                          it.third.let { s -> "$s".padStart(2, '0') }
+
+                  Text(
+                      modifier = Modifier.fillMaxWidth(),
+                      text = duration,
+                      fontSize = 9.sp,
+                      fontWeight = FontWeight.Bold,
+                      textAlign = TextAlign.Right,
+                  )
+                }
+              }
+            }
+          }
+        }
+
+        AnimatedOpacity(visible = showMetadata) {
+          Column(
               modifier =
-                  Modifier.wrapContentSize()
+                  Modifier.fillMaxSize()
                       .padding(
                           vertical = 6.dp,
                           horizontal = 8.dp,
                       ),
-              horizontalArrangement = Arrangement.SpaceBetween,
-              verticalAlignment = Alignment.CenterVertically,
+              horizontalAlignment = Alignment.Start,
+              verticalArrangement = Arrangement.SpaceBetween,
           ) {
-            Icon(
-                painter = painterResource(id = icon),
-                contentDescription = "Button Icon",
-                modifier = Modifier.size(18.dp),
-            )
-
-            item.durationHMS()?.let {
-              val duration =
-                  (it.first.takeIf { it > 0 }?.let { h -> "${h}:" } ?: "") +
-                      it.second.let { m -> "${m}:" } +
-                      it.third.let { s -> "$s".padStart(2, '0') }
-
+            Column {
               Text(
-                  modifier = Modifier.fillMaxWidth(),
-                  text = duration,
-                  fontSize = 9.sp,
-                  fontWeight = FontWeight.Bold,
-                  textAlign = TextAlign.Right,
+                  text = "Name: ${item.nameLabel()}",
+                  style =
+                      TextStyle(
+                          fontSize = 9.sp,
+                          fontWeight = FontWeight.Bold,
+                          color = Color.White,
+                      ),
+                  maxLines = 3,
+                  overflow = TextOverflow.Ellipsis,
               )
+              Text(
+                  text = "Date: ${item.dateAdded}",
+                  style =
+                      TextStyle(
+                          fontSize = 9.sp,
+                          fontWeight = FontWeight.Bold,
+                          color = Color.White,
+                      ),
+                  maxLines = 1,
+                  overflow = TextOverflow.Visible,
+              )
+              Text(
+                  text = "Kind: ${item.mimeTypeLabel()}",
+                  style =
+                      TextStyle(
+                          fontSize = 9.sp,
+                          fontWeight = FontWeight.Bold,
+                          color = Color.White,
+                      ),
+                  maxLines = 1)
+              Text(
+                  text = "Size: ${item.sizeLabel()}",
+                  style =
+                      TextStyle(
+                          fontSize = 9.sp,
+                          fontWeight = FontWeight.Bold,
+                          color = Color.White,
+                      ),
+                  maxLines = 1)
+            }
+
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+              Icon(
+                  painter = painterResource(id = icon),
+                  contentDescription = "Button Icon",
+                  modifier = Modifier.size(18.dp))
+
+              item.durationHMS()?.let {
+                val duration =
+                    (it.first.takeIf { it > 0 }?.let { h -> "${h}:" } ?: "") +
+                        it.second.let { m -> "${m}:" } +
+                        it.third.let { s -> "$s".padStart(2, '0') }
+
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = duration,
+                    fontSize = 9.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Right,
+                )
+              }
             }
           }
-        }
-      }
-    }
 
-    AnimatedOpacity(visible = showMetadata) {
-      Column(
-          modifier =
-              Modifier.fillMaxSize()
-                  .padding(
-                      vertical = 6.dp,
-                      horizontal = 8.dp,
-                  ),
-          horizontalAlignment = Alignment.Start,
-          verticalArrangement = Arrangement.SpaceBetween,
-      ) {
-        Column {
-          Text(
-              text = "Name: ${item.nameLabel()}",
-              style =
-                  TextStyle(
-                      fontSize = 9.sp,
-                      fontWeight = FontWeight.Bold,
-                      color = Color.White,
-                  ),
-              maxLines = 3,
-              overflow = TextOverflow.Ellipsis,
-          )
-          Text(
-              text = "Date: ${item.dateAdded}",
-              style =
-                  TextStyle(
-                      fontSize = 9.sp,
-                      fontWeight = FontWeight.Bold,
-                      color = Color.White,
-                  ),
-              maxLines = 1,
-              overflow = TextOverflow.Visible,
-          )
-          Text(
-              text = "Kind: ${item.mimeTypeLabel()}",
-              style =
-                  TextStyle(
-                      fontSize = 9.sp,
-                      fontWeight = FontWeight.Bold,
-                      color = Color.White,
-                  ),
-              maxLines = 1,
-          )
-          Text(
-              text = "Size: ${item.sizeLabel()}",
-              style =
-                  TextStyle(
-                      fontSize = 9.sp,
-                      fontWeight = FontWeight.Bold,
-                      color = Color.White,
-                  ),
-              maxLines = 1,
-          )
+          Box(
+              modifier =
+                  Modifier.fillMaxSize()
+                      .background(Color.Black.copy(alpha = .5f))
+                      .blur(100.dp)
+                      .zIndex(-1f))
         }
 
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-          Icon(
-              painter = painterResource(id = icon),
-              contentDescription = "Button Icon",
-              modifier = Modifier.size(18.dp),
-          )
+        if (openMediaIds.value.contains(item.id)) {
+          Box(
+              contentAlignment = Alignment.Center,
+              modifier =
+                  Modifier.matchParentSize()
+                      .background(AppColor.GradientInEnvironmentStart)
+                      .blur(radius = 16.dp)
+                      .clip(RoundedCornerShape(5.dp)),
+          ) {}
 
-          item.durationHMS()?.let {
-            val duration =
-                (it.first.takeIf { it > 0 }?.let { h -> "${h}:" } ?: "") +
-                    it.second.let { m -> "${m}:" } +
-                    it.third.let { s -> "$s".padStart(2, '0') }
-
+          Box(
+              contentAlignment = Alignment.Center,
+              modifier = Modifier.matchParentSize().clip(RoundedCornerShape(5.dp)),
+          ) {
             Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = duration,
-                fontSize = 9.sp,
+                modifier = Modifier.padding(horizontal = 5.dp).fillMaxWidth(),
+                text = "Media in\nEnvironment",
+                fontSize = 10.sp,
                 fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Right,
+                textAlign = TextAlign.Center,
             )
           }
         }
@@ -230,38 +259,4 @@ fun MediaItemView(
           }
         }
       }
-
-      Box(
-          modifier =
-              Modifier.fillMaxSize()
-                  .background(Color.Black.copy(alpha = .5f))
-                  .blur(100.dp)
-                  .zIndex(-1f)
-      )
-    }
-
-    if (openMediaIds.value.contains(item.id)) {
-      Box(
-          contentAlignment = Alignment.Center,
-          modifier =
-              Modifier.matchParentSize()
-                  .background(AppColor.GradientInEnvironmentStart)
-                  .blur(radius = 16.dp)
-                  .clip(RoundedCornerShape(5.dp)),
-      ) {}
-
-      Box(
-          contentAlignment = Alignment.Center,
-          modifier = Modifier.matchParentSize().clip(RoundedCornerShape(5.dp)),
-      ) {
-        Text(
-            modifier = Modifier.padding(horizontal = 5.dp).fillMaxWidth(),
-            text = "Media in\nEnvironment",
-            fontSize = 10.sp,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center,
-        )
-      }
-    }
-  }
 }
