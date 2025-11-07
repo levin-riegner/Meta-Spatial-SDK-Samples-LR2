@@ -18,6 +18,7 @@ import com.meta.spatial.toolkit.PanelRegistration
 import com.meta.spatial.vr.LocomotionSystem
 import com.meta.spatial.vr.VRFeature
 import com.meta.levinriegner.mediaview.app.events.EventBus
+import com.meta.spatial.vr.VrInputSystemType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

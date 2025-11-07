@@ -203,6 +203,7 @@ dependencies {
   implementation("com.meta.spatial:meta-spatial-sdk-vr:$metaSpatialSdkVersion")
   implementation("com.meta.spatial:meta-spatial-sdk-mruk:$metaSpatialSdkVersion")
   implementation("com.meta.spatial:meta-spatial-sdk-castinputforward:$metaSpatialSdkVersion")
+  implementation("com.meta.spatial:meta-spatial-sdk-isdk:$metaSpatialSdkVersion")
   implementation(files("libs/meta-spatial-sdk-uiset-release.aar"))
 
   // Meta Spatial SDK dependencies
