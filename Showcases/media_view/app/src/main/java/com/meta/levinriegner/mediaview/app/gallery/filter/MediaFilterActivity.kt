@@ -143,44 +143,44 @@ private fun FilterList(
          verticalAlignment = Alignment.CenterVertically) {}
 
 
-      BorderedButton(
-          modifier =
-              Modifier
-                  .padding(horizontal = 10.dp, vertical = 20.dp)
-                  .height(96.dp)
-                  .fillMaxWidth(),
-          label = stringResource(R.string.add_media),
-          onClick = { if (!isSelectionMode) onUpload() },
-          borderColor = if (isSelectionMode) AppColor.White30 else AppColor.White60,
-          labelTextStyle = TextStyle(
-              fontSize = 35.sp, 
-                fontWeight = FontWeight.Bold
-          ),
-          expanded = true,
-          leading = {
-            Row {
-              Icon(
-                  painter = painterResource(id = R.drawable.icon_upload),
-                  contentDescription = stringResource(R.string.add_media),
-                  tint = if (isSelectionMode) AppColor.White60 else AppColor.White,
-                  modifier = Modifier
-                      .size(84.dp)
-                      .padding(start = 0.dp, end = 0.dp)
-              )
-              Spacer(modifier = Modifier.width(40.dp))
+    //   BorderedButton(
+    //       modifier =
+    //           Modifier
+    //               .padding(horizontal = 10.dp, vertical = 20.dp)
+    //               .height(96.dp)
+    //               .fillMaxWidth(),
+    //       label = stringResource(R.string.add_media),
+    //       onClick = { if (!isSelectionMode) onUpload() },
+    //       borderColor = if (isSelectionMode) AppColor.White30 else AppColor.White60,
+    //       labelTextStyle = TextStyle(
+    //           fontSize = 35.sp, 
+    //             fontWeight = FontWeight.Bold
+    //       ),
+    //       expanded = true,
+    //       leading = {
+    //         Row {
+    //           Icon(
+    //               painter = painterResource(id = R.drawable.icon_upload),
+    //               contentDescription = stringResource(R.string.add_media),
+    //               tint = if (isSelectionMode) AppColor.White60 else AppColor.White,
+    //               modifier = Modifier
+    //                   .size(84.dp)
+    //                   .padding(start = 0.dp, end = 0.dp)
+    //           )
+    //           Spacer(modifier = Modifier.width(40.dp))
 
-            }
-          },
-          contentAlignment = Alignment.Start,
-          colors = if (isSelectionMode) {
-              // Use custom colors for disabled state - foregroundColor controls text color
-              BorderedButtonDefaults.colors(
-                  foregroundColor = AppColor.White60
-              )
-          } else {
-              // Use default colors for enabled state
-              BorderedButtonDefaults.colors()
-          }
-      )
+    //         }
+    //       },
+    //       contentAlignment = Alignment.Start,
+    //       colors = if (isSelectionMode) {
+    //           // Use custom colors for disabled state - foregroundColor controls text color
+    //           BorderedButtonDefaults.colors(
+    //               foregroundColor = AppColor.White60
+    //           )
+    //       } else {
+    //           // Use default colors for enabled state
+    //           BorderedButtonDefaults.colors()
+    //       }
+    //   )
   }
 }
